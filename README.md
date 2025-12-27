@@ -1,15 +1,15 @@
-# Curso: Especialización en IA Práctica y Transformación Digital
+# Curso: Introducción a la IA
 **Instructor:** Juan Pablo Jaramillo | Estadístico & Data Scientist
 
 ---
 
-## 👤 Presentación del Instructor
+## 👤 Presentación
 **Estadístico y Especialista en Inteligencia Artificial.**
 Científico de Datos enfocado en la **Transformación Digital de Operaciones**. Experto en la integración de modelos matemáticos y computacionales para la optimización de procesos industriales y toma de decisiones estratégica.
 
 ---
 
-## 📚 Estructura del Curso (7 Módulos - 3.5 hrs c/u)
+## 📚 Estructura de los módulos
 
 ### Módulo 1: Inmersión y Herramientas Generativas
 * **Ecosistema:** Autores clave, empresas líderes y funcionamiento general de la IA.
@@ -27,9 +27,9 @@ Científico de Datos enfocado en la **Transformación Digital de Operaciones**. 
 * **Ética:** Dilemas morales en la automatización y transparencia de algoritmos ("Caja Negra").
 * **Responsabilidad:** Sesgos estadísticos en los datos y marcos regulatorios actuales.
 
-### Módulo 5: Sistemas de Control e IA
+### Módulo 5: Sistemas de Control e IA 
 * **Integración:** Cómo la IA se fusiona con los sistemas de control clásicos (PID, PLC).
-* **Optimización:** Control predictivo basado en modelos (MPC) y gemelos digitales (Digital Twins).
+* **Optimización:** Control predictivo basado en modelos (MPC) 
 
 ### Módulo 6: Aprendizaje por Refuerzo (Reinforcement Learning)
 * **Conceptos:** Agentes, estados, acciones y recompensas.
