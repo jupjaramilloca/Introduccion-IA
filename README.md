@@ -5,7 +5,7 @@
 
 ## 👤 Presentación
 **Estadístico y Especialista en Inteligencia Artificial.**
-Científico de Datos enfocado en la **Transformación Digital de Operaciones**. Experto en la integración de modelos matemáticos y computacionales para la optimización de procesos industriales y toma de decisiones estratégica.
+Científico de Datos enfocado en la **Transformación Digital de Operaciones**. Experto en la integración de modelos matemáticos y computacionales para la optimización de procesos y toma de decisiones estratégica.
 
 ---
 
