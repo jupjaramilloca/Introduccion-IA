@@ -1,0 +1,23 @@
+# Ambientes virtuales (Windows y Linux)
+.venv/
+venv/
+env/
+ENV/
+
+# Archivos temporales de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Cache de la API (muy importante para tu script)
+.cache
+
+# Variables de entorno (donde guardas contraseñas/llaves de Supabase)
+.env
+
+# Carpetas de VS Code
+.vscode/
+
+# Archivos de sistema
+Thumbs.db
+Desktop.ini
