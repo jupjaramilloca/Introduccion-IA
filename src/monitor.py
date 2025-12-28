@@ -106,7 +106,7 @@ fig.update_layout(
     height=1400, template="plotly_dark",
     title=f"<b>ESTACIÓN METEOROLÓGICA INTELIGENTE</b><br>" +
           f"<span style='font-size:16px; color:cyan;'>📍 Ubicación: {lat_api}°N, {lon_api}°E | " +
-          f"⛰️ Elevación: {elevacion_api}m snm | 🌍 Zona: {timezone_api}</span>",
+          f"⛰️ Elevación: {elevacion_api}| 🌍 Zona: {timezone_api}</span>",
     margin=dict(t=120, b=100),
     showlegend=False
 )
