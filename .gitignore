@@ -21,3 +21,4 @@ __pycache__/
 # Archivos de sistema
 Thumbs.db
 Desktop.ini
+*.html
