@@ -1,0 +1,36 @@
+name: Monitor Meteorologico Rionegro
+
+on:
+  schedule:
+    # Ejecuta cada 30 minutos (:00 y :30 de cada hora)
+    - cron: '0,30 * * * *'
+  workflow_dispatch: # Permite ejecución manual desde la pestaña Actions
+
+permissions:
+  contents: write
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Instalar librerias
+        run: pip install -r requirements.txt
+
+      - name: Ejecutar Monitor
+        run: python src/monitor.py
+
+      - name: Publicar en GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./ 
+          publish_branch: gh-pages
