@@ -24,7 +24,7 @@ jobs:
           CITY_LAT: ${{ vars.CITY_LAT }}
           CITY_LON: ${{ vars.CITY_LON }}
           CITY_NAME: ${{ vars.CITY_NAME }}
-        run: python monitor.py
+        run: python src/monitor.py
       - name: Deploy to GH Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
