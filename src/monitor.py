@@ -11,9 +11,22 @@ from statsmodels.tsa.arima.model import ARIMA
 from datetime import datetime
 
 # 1. CONFIGURACIÓN DINÁMICA
-LAT = float(os.getenv("CITY_LAT", 6.1239))
-LON = float(os.getenv("CITY_LON", -75.3766))
-CITY_NAME = os.getenv("CITY_NAME", "Rionegro, Ant")
+# Reemplaza tu sección 1 por esta:
+# ==========================================
+# 1. CONFIGURACIÓN DINÁMICA (BLINDADA)
+# ==========================================
+def get_env_float(key, default):
+    value = os.getenv(key)
+    # Si la variable no existe o está vacía (''), usa el default
+    if not value or value.strip() == "":
+        return default
+    return float(value)
+
+LAT = get_env_float("CITY_LAT", 6.1239)
+LON = get_env_float("CITY_LON", -75.3766)
+CITY_NAME = os.getenv("CITY_NAME")
+if not CITY_NAME:
+    CITY_NAME = "Rionegro, Ant"
 
 cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
 retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
