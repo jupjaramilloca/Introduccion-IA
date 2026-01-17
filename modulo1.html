@@ -48,6 +48,7 @@
         .author-img:hover { filter: grayscale(0); border-color: #06b6d4; }
         .prompt-card { border: 1px solid #222; padding: 20px; background: #080808; }
         .prompt-example { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #74aa9c; background: #000; padding: 10px; border-radius: 2px; border-left: 2px solid #74aa9c; }
+        .chart-caption { font-size: 11px; color: #64748b; margin-top: 15px; line-height: 1.4; text-align: center; font-weight: 300; }
     </style>
 </head>
 <body class="antialiased font-roboto">
@@ -134,43 +135,50 @@
         </div>
     </section>
 
-    <section id="neurona" class="bg-[#020202]">
-        <h2 class="text-3xl font-bold mb-12 border-l-4 border-cyber-cyan pl-6 uppercase tracking-widest text-white">Mecánica de Procesamiento</h2>
+    <section id="impacto-academico" class="bg-[#020202]">
+        <h2 class="text-3xl font-bold mb-12 border-l-4 border-cyber-cyan pl-6 uppercase tracking-widest text-white">Impacto Académico</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="glass-card p-8 rounded-2xl">
+                <div class="h-[300px]">
+                    <canvas id="citationsChart"></canvas>
+                </div>
+                <p class="chart-caption"><strong>Citas Académicas:</strong> Representa la autoridad técnica y los cimientos sobre los que se apoya la IA actual. Hinton y Bengio establecieron las bases que Sutskever escaló hacia los LLMs.</p>
+            </div>
+            <div class="space-y-6">
+                <p class="text-slate-300 font-light">El volumen de citas representa la base sobre la cual se construye la IA actual. Ganadores del Premio Turing y líderes de OpenAI encabezan la influencia técnica global.</p>
+                <ul class="space-y-4 text-sm text-slate-400">
+                    <li class="flex items-center gap-3"><span class="w-3 h-3 bg-cyber-cyan rounded-full"></span> Geoffrey Hinton: Pionero del Backpropagation.</li>
+                    <li class="flex items-center gap-3"><span class="w-3 h-3 bg-cyber-purple rounded-full"></span> Ilya Sutskever: Motor del escalado de LLMs.</li>
+                    <li class="flex items-center gap-3"><span class="w-3 h-3 bg-cyber-green rounded-full"></span> Yoshua Bengio: Arquitecto de redes recurrentes.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="neurona">
+        <h2 class="text-3xl font-bold mb-12 border-l-4 border-cyber-cyan pl-6 uppercase tracking-widest text-white">La Neurona Artificial y Propagación</h2>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div class="space-y-8">
-                <p class="text-slate-300 font-light">La unidad fundamental de la IA emula la neurona biológica mediante un modelo matemático que procesa señales de entrada.</p>
-                
-                
-
-[Image of a biological neuron versus an artificial neuron diagram]
-
-
+                <p class="text-slate-300 font-light">La unidad fundamental emula la activación biológica mediante sumas ponderadas y funciones no lineales.</p>
                 <div class="math-box">
                     <span class="text-cyber-cyan text-[10px] uppercase font-bold block mb-4 tracking-[2px]">1. Propagación hacia adelante (Forward Pass)</span>
                     \[ z = \sum_{i=1}^{n} w_i x_i + b \implies a = \sigma(z) \]
-                    <p class="text-[11px] text-slate-500 mt-4 leading-relaxed font-mono">Donde \(w\) representa los pesos (importancia), \(b\) el sesgo y \(\sigma\) la función de activación (ReLU, Sigmoid).</p>
                 </div>
             </div>
-
             <div class="space-y-8">
-                
-
                 <div class="math-box">
                     <span class="text-cyber-purple text-[10px] uppercase font-bold block mb-4 tracking-[2px]">2. Backpropagation (Regla de la Cadena)</span>
                     \[ \frac{\partial J}{\partial w} = \frac{\partial J}{\partial a} \cdot \frac{\partial a}{\partial z} \cdot \frac{\partial z}{\partial w} \]
-                    <p class="text-[11px] text-slate-500 mt-4 leading-relaxed font-mono">El aprendizaje ocurre al propagar el error hacia atrás, ajustando los gradientes de la función de pérdida \(J\) respecto a cada peso individual.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="prompts">
-        <h2 class="text-3xl font-bold mb-12 border-l-4 border-cyber-purple pl-6 uppercase tracking-widest">Estructura del Pensamiento</h2>
-        <p class="text-slate-400 mb-12 font-light">En 2026, el <strong>Prompt Engineering</strong> es la arquitectura del pensamiento. Aplicamos la estructura determinista (P.E.F.) para obtener resultados de alta precisión.</p>
-
+    <section id="prompts" class="bg-[#020202]">
+        <h2 class="text-3xl font-bold mb-12 border-l-4 border-cyber-purple pl-6 uppercase tracking-widest">Ingeniería de Prompts</h2>
         <div class="math-box mb-12 border-cyber-purple/30 text-center py-10">
-            <span class="text-cyber-purple text-xs uppercase font-bold block mb-4 tracking-[3px]">La Fórmula del Prompt Estructural (P.E.F.)</span>
-            <div class="text-xl md:text-3xl font-thin tracking-widest">
+            <span class="text-cyber-purple text-xs uppercase font-bold block mb-4 tracking-[3px]">La Fórmula Maestra (P.E.F.)</span>
+            <div class="text-xl md:text-3xl font-thin tracking-widest text-white">
                 Prompt = <span class="text-cyber-cyan">[Persona]</span> + <span class="text-white">[Contexto]</span> + <span class="text-white/40">[Tarea]</span> + <span class="text-cyber-purple">[Restricciones]</span> + <span class="text-cyber-blue">[Formato]</span>
             </div>
         </div>
@@ -178,103 +186,101 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="prompt-card glass-card">
                 <h3 class="text-cyber-cyan font-bold text-sm mb-2 uppercase">Chain of Thought</h3>
-                <p class="text-xs text-slate-400 mb-4 font-light">Guía al modelo en pasos lógicos.</p>
                 <div class="prompt-example">"Analiza paso a paso: 1. Identifica variables, 2. Calcula..."</div>
             </div>
             <div class="prompt-card glass-card">
-                <h3 class="text-cyber-green font-bold text-sm mb-2 uppercase">Few-Shot Prompting</h3>
-                <p class="text-xs text-slate-400 mb-4 font-light">Uso de ejemplos contextuales.</p>
+                <h3 class="text-cyber-green font-bold text-sm mb-2 uppercase">Few-Shot</h3>
                 <div class="prompt-example">"Input: A -> Output: B. Ahora resuelve para C."</div>
             </div>
             <div class="prompt-card glass-card">
                 <h3 class="text-cyber-purple font-bold text-sm mb-2 uppercase">Persona Adoption</h3>
-                <p class="text-xs text-slate-400 mb-4 font-light">Asignación de roles técnicos.</p>
                 <div class="prompt-example">"Actúa como un experto en MLOps Senior y audita..."</div>
             </div>
             <div class="prompt-card glass-card">
                 <h3 class="text-cyber-blue font-bold text-sm mb-2 uppercase">Neuro-Symbolic</h3>
-                <p class="text-xs text-slate-400 mb-4 font-light">Restricciones lógicas estrictas.</p>
                 <div class="prompt-example">"Responde basándote solo en el documento adjunto."</div>
             </div>
         </div>
     </section>
 
-    <section id="mercado" class="bg-[#020202]">
+    <section id="mercado">
         <h2 class="text-3xl font-bold mb-12 border-l-4 border-cyber-green pl-6 uppercase tracking-widest text-white">Actores Dominantes 2026</h2>
         <div class="company-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="card glass-card p-10 rounded-2xl hover:border-cyber-cyan transition-all">
+            <div class="card glass-card p-10 rounded-2xl">
                 <span class="text-cyber-cyan font-bold tracking-[3px] uppercase block mb-4">OpenAI / Microsoft</span>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Liderazgo en <strong>IA Agéntica</strong> y razonamiento lógico puro con el modelo O1 y GPT-5.2.</p>
+                <p class="text-sm text-slate-400 leading-relaxed font-light">Liderazgo en <strong>IA Agéntica</strong> y razonamiento lógico puro con el modelo O1 y GPT-5.2.</p>
                 <span class="tag bg-cyber-cyan/10 text-cyber-cyan px-2 py-1 text-[10px] mt-6 inline-block rounded uppercase tracking-tighter">Reasoning Engine</span>
             </div>
-            <div class="card glass-card p-10 rounded-2xl hover:border-cyber-blue transition-all">
+            <div class="card glass-card p-10 rounded-2xl">
                 <span class="text-cyber-blue font-bold tracking-[3px] uppercase block mb-4">Google DeepMind</span>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Dominio en <strong>IA Científica</strong> y modelos multimodales nativos de contexto infinito (Gemini 2).</p>
+                <p class="text-sm text-slate-400 leading-relaxed font-light">Dominio en <strong>IA Científica</strong> y modelos multimodales nativos de contexto masivo.</p>
                 <span class="tag bg-cyber-blue/10 text-cyber-blue px-2 py-1 text-[10px] mt-6 inline-block rounded uppercase tracking-tighter">Scientific AI</span>
             </div>
-            <div class="card glass-card p-10 rounded-2xl hover:border-cyber-green transition-all">
+            <div class="card glass-card p-10 rounded-2xl">
                 <span class="text-cyber-green font-bold tracking-[3px] uppercase block mb-4">NVIDIA</span>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Monopolio del hardware físico. Arquitectura <strong>Rubin</strong> es el sistema nervioso de la IA global.</p>
+                <p class="text-sm text-slate-400 leading-relaxed font-light">Monopolio del hardware físico. Arquitectura <strong>Rubin</strong> es el sistema nervioso de la IA global.</p>
                 <span class="tag bg-cyber-green/10 text-cyber-green px-2 py-1 text-[10px] mt-6 inline-block rounded uppercase tracking-tighter">Hardware Infra</span>
             </div>
-            <div class="card glass-card p-10 rounded-2xl hover:border-cyber-purple transition-all">
+            <div class="card glass-card p-10 rounded-2xl">
                 <span class="text-cyber-purple font-bold tracking-[3px] uppercase block mb-4">Anthropic</span>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Referente en <strong>IA Constitucional</strong> y alineación de seguridad para ingeniería crítica.</p>
+                <p class="text-sm text-slate-400 leading-relaxed font-light">Referente en <strong>IA Constitucional</strong> y alineación de seguridad para flujos de trabajo críticos.</p>
                 <span class="tag bg-cyber-purple/10 text-cyber-purple px-2 py-1 text-[10px] mt-6 inline-block rounded uppercase tracking-tighter">Safety & Ethics</span>
             </div>
-            <div class="card glass-card p-10 rounded-2xl hover:border-white transition-all">
+            <div class="card glass-card p-10 rounded-2xl">
                 <span class="text-white font-bold tracking-[3px] uppercase block mb-4">Meta</span>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Estandarte del <strong>Código Abierto</strong>. Llama 4 democratiza la inteligencia de frontera.</p>
+                <p class="text-sm text-slate-400 leading-relaxed font-light">Estandarte del <strong>Código Abierto</strong>. Llama 4 democratiza la inteligencia de frontera.</p>
                 <span class="tag bg-white/10 text-white px-2 py-1 text-[10px] mt-6 inline-block rounded uppercase tracking-tighter">Open Source</span>
             </div>
-            <div class="card glass-card p-10 rounded-2xl hover:border-cyber-cyan transition-all">
+            <div class="card glass-card p-10 rounded-2xl">
                 <span class="text-cyber-cyan font-bold tracking-[3px] uppercase block mb-4">xAI</span>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Integración de datos masivos en tiempo real y razonamiento basado en flujos continuos.</p>
-                <span class="tag bg-cyber-cyan/10 text-cyber-cyan px-2 py-1 text-[10px] mt-6 inline-block rounded uppercase tracking-tighter">Real-Time Logic</span>
+                <p class="text-sm text-slate-400 leading-relaxed font-light">Integración de datos masivos en tiempo real y razonamiento basado en flujos continuos.</p>
+                <span class="tag bg-cyber-cyan/10 text-cyber-cyan px-2 py-1 text-[10px] mt-6 inline-block rounded uppercase tracking-tighter">Real-Time Data</span>
             </div>
         </div>
     </section>
 
-    <section id="metricas">
-        <h2 class="text-3xl font-bold mb-12 border-l-4 border-cyber-cyan pl-6 uppercase tracking-widest">Performance Analytics 2026</h2>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            
-            <div class="glass-card p-10 rounded-3xl">
-                <h3 class="text-center text-white font-bold uppercase tracking-widest text-[10px] mb-8">Evolución de Impacto Académico e Industrial</h3>
-                <div class="h-[350px]">
+    <section id="metricas" class="bg-[#020202]">
+        <h2 class="text-3xl font-bold mb-12 border-l-4 border-cyber-cyan pl-6 uppercase tracking-widest">Performance & Influence 2026</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+            <div class="glass-card p-8 rounded-3xl">
+                <h3 class="text-center text-white font-bold uppercase tracking-widest text-[10px] mb-8">Tendencia de Investigación (2019-2024)</h3>
+                <div class="h-[300px]">
                     <canvas id="trendsChart"></canvas>
                 </div>
+                <p class="chart-caption"><strong>Evolución de Investigación:</strong> El salto exponencial entre 2022 y 2024 marca la transición de la IA de laboratorio a la IA de consumo masivo y LLMs.</p>
             </div>
 
+            <div class="glass-card p-8 rounded-3xl">
+                <h3 class="text-center text-white font-bold uppercase tracking-widest text-[10px] mb-8">Perfiles de Influencia</h3>
+                <div class="h-[300px]">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <p class="chart-caption"><strong>Radar de Influencia:</strong> El equilibrio de 2026 requiere la suma de ciencia (Sutskever), ejecución industrial (Altman) y brújula ética (Bengio).</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div class="glass-card p-10 rounded-3xl">
+                <h3 class="text-center text-white font-bold uppercase tracking-widest text-[10px] mb-8">Evolución de Impacto Industrial</h3>
+                <div class="h-[300px]">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+                <p class="chart-caption"><strong>IA Agéntica vs Estadística:</strong> El punto de inflexión donde las empresas dejan de usar IA para analizar y empiezan a usarla para operar autónomamente.</p>
+            </div>
             <div class="space-y-8">
-                <h3 class="text-xl font-thin uppercase tracking-[4px]">Benchmark de Motores (Enero 2026)</h3>
+                <h3 class="text-xl font-thin uppercase tracking-[4px] text-white">Eficacia de Motores</h3>
                 <div class="group">
-                    <div class="flex justify-between text-[10px] tracking-[3px] uppercase mb-3 text-white/40">
-                        <span>GPT-5.2 (OpenAI)</span>
-                        <span>98.4%</span>
-                    </div>
-                    <div class="h-[1px] bg-white/5 w-full"><div class="h-full bg-cyber-cyan w-[98.4%] shadow-[0_0_10px_#06b6d4]"></div></div>
+                    <div class="flex justify-between text-[10px] tracking-[3px] uppercase mb-3 text-white/40"><span>GPT-5.2 (Reasoning)</span><span>98.4%</span></div>
+                    <div class="h-[1px] bg-white/5 w-full"><div class="h-full bg-cyber-cyan w-[98.4%]"></div></div>
                 </div>
                 <div class="group">
-                    <div class="flex justify-between text-[10px] tracking-[3px] uppercase mb-3 text-white/40">
-                        <span>Gemini 3 Pro (Google)</span>
-                        <span>96.8%</span>
-                    </div>
-                    <div class="h-[1px] bg-white/5 w-full"><div class="h-full bg-cyber-blue w-[96.8%] shadow-[0_0_10px_#3b82f6]"></div></div>
+                    <div class="flex justify-between text-[10px] tracking-[3px] uppercase mb-3 text-white/40"><span>Gemini 3 Pro</span><span>96.8%</span></div>
+                    <div class="h-[1px] bg-white/5 w-full"><div class="h-full bg-cyber-blue w-[96.8%]"></div></div>
                 </div>
                 <div class="group">
-                    <div class="flex justify-between text-[10px] tracking-[3px] uppercase mb-3 text-white/40">
-                        <span>Claude 4.5 Opus (Anthropic)</span>
-                        <span>95.2%</span>
-                    </div>
-                    <div class="h-[1px] bg-white/5 w-full"><div class="h-full bg-cyber-purple w-[95.2%] shadow-[0_0_10px_#d946ef]"></div></div>
-                </div>
-                <div class="group">
-                    <div class="flex justify-between text-[10px] tracking-[3px] uppercase mb-3 text-white/40">
-                        <span>Llama 4 (700B - Meta)</span>
-                        <span>91.0%</span>
-                    </div>
-                    <div class="h-[1px] bg-white/5 w-full"><div class="h-full bg-white w-[91%] shadow-[0_0_10px_#fff]"></div></div>
+                    <div class="flex justify-between text-[10px] tracking-[3px] uppercase mb-3 text-white/40"><span>Claude 4.5 Opus</span><span>95.2%</span></div>
+                    <div class="h-[1px] bg-white/5 w-full"><div class="h-full bg-cyber-purple w-[95.2%]"></div></div>
                 </div>
             </div>
         </div>
@@ -283,47 +289,78 @@
     <footer class="bg-black py-20 text-center border-t border-white/5 font-roboto">
         <div class="text-[20px] font-bold tracking-[10px] uppercase mb-4 text-white">Prometheus <span class="text-white/40 font-thin">Logic</span></div>
         <p class="text-xs tracking-[4px] text-white/20 uppercase mb-12">Juan Pablo Jaramillo | Módulo 01 Finalizado</p>
-        <div class="flex justify-center gap-4">
-             <a href="index.html" class="px-10 py-4 border border-white/20 text-white font-bold uppercase text-[10px] tracking-[3px] hover:bg-white hover:text-black transition-colors">Volver al inicio</a>
-        </div>
+        <a href="index.html" class="px-10 py-4 border border-white/20 text-white font-bold uppercase text-[10px] tracking-[3px] hover:bg-white hover:text-black transition-all">Volver al inicio</a>
     </footer>
 
     <script>
-        const ctxTrends = document.getElementById('trendsChart').getContext('2d');
-        new Chart(ctxTrends, {
+        // Configuración Común
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = 'Outfit';
+
+        // 1. Gráfico de Citas
+        new Chart(document.getElementById('citationsChart'), {
+            type: 'bar',
+            data: {
+                labels: ['G. Hinton', 'Y. Bengio', 'Y. LeCun', 'I. Sutskever', 'A. Ng'],
+                datasets: [{
+                    data: [680, 590, 420, 380, 310],
+                    backgroundColor: ['#06b6d4', '#d946ef', '#3b82f6', '#10b981', '#f59e0b'],
+                    borderRadius: 4
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 2. Gráfico de Tendencias
+        new Chart(document.getElementById('trendsChart'), {
+            type: 'line',
+            data: {
+                labels: ['2019', '2020', '2021', '2022', '2023', '2024'],
+                datasets: [
+                    { label: 'LLMs & GenAI', data: [10, 25, 45, 110, 190, 280], borderColor: '#d946ef', fill: true, backgroundColor: 'rgba(217, 70, 239, 0.1)', tension: 0.4 },
+                    { label: 'Tradicional (CNN/RNN)', data: [80, 85, 88, 90, 92, 94], borderColor: '#06b6d4', tension: 0.4 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { font: { size: 10 } } } } }
+        });
+
+        // 3. Gráfico de Radar
+        new Chart(document.getElementById('radarChart'), {
+            type: 'radar',
+            data: {
+                labels: ['Investigación Pura', 'Impacto Industria', 'Reconocimiento Público', 'Ética y Seguridad', 'Liderazgo Producto'],
+                datasets: [
+                    { label: 'Ilya Sutskever', data: [98, 85, 70, 90, 80], borderColor: '#06b6d4', backgroundColor: 'rgba(6, 182, 212, 0.2)' },
+                    { label: 'Sam Altman', data: [40, 98, 95, 65, 99], borderColor: '#d946ef', backgroundColor: 'rgba(217, 70, 239, 0.2)' },
+                    { label: 'Yoshua Bengio', data: [95, 60, 85, 99, 50], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.2)' }
+                ]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                scales: { r: { grid: { color: 'rgba(255,255,255,0.05)' }, angleLines: { color: 'rgba(255,255,255,0.05)' }, ticks: { display: false } } } 
+            }
+        });
+
+        // 4. Gráfico de Performance
+        new Chart(document.getElementById('performanceChart'), {
             type: 'line',
             data: {
                 labels: ['2021', '2022', '2023', '2024', '2025', '2026'],
                 datasets: [
-                    {
-                        label: 'LLMs & GenAI',
-                        data: [20, 35, 70, 150, 220, 290],
-                        borderColor: '#d946ef',
-                        backgroundColor: 'rgba(217, 70, 239, 0.1)',
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        fill: true
-                    },
-                    {
-                        label: 'IA Neuro-Simbólica',
-                        data: [10, 15, 25, 60, 130, 240],
-                        borderColor: '#06b6d4',
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        tension: 0.4
-                    }
+                    { label: 'IA Agéntica', data: [20, 35, 70, 150, 220, 290], borderColor: '#fff', tension: 0.4, fill: false },
+                    { label: 'IA Estadística', data: [80, 90, 100, 110, 115, 120], borderColor: '#333', tension: 0.4, fill: false }
                 ]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { color: 'rgba(255,255,255,0.02)' }, ticks: { color: '#444', font: { size: 9 } } },
-                    y: { grid: { color: 'rgba(255,255,255,0.02)' }, ticks: { display: false } }
-                }
-            }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
     </script>
 </body>
