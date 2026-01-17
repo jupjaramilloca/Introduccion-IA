@@ -2,21 +2,137 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Curso de Programación</title>
-    <link rel="stylesheet" href="css/estilos.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prometheus Logic | Juan Pablo Jaramillo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background-color: #000; color: #fff; scroll-behavior: smooth; overflow-x: hidden; }
+
+        /* Navegación */
+        header {
+            position: fixed;
+            top: 0; width: 100%; padding: 20px 50px;
+            display: flex; align-items: center; z-index: 1000;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+        }
+        .logo { font-weight: 700; font-size: 22px; letter-spacing: 6px; flex: 1; color: #fff; text-decoration: none; }
+        nav { display: flex; gap: 25px; }
+        nav a { color: #fff; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; opacity: 0.8; }
+        nav a:hover { opacity: 1; }
+
+        /* Secciones Generales */
+        .section {
+            height: 100vh; width: 100%; background-size: cover; background-position: center;
+            display: flex; align-items: flex-end; padding: 80px 10%; position: relative;
+            border-bottom: 1px solid #222;
+        }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1; }
+        .content { position: relative; z-index: 2; max-width: 700px; margin-bottom: 60px; animation: fadeInUp 1.2s ease; }
+        
+        .label { font-size: 14px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; display: block; color: #aaa; }
+        h2 { font-size: 45px; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; line-height: 1; }
+        p { font-size: 18px; margin-bottom: 25px; font-weight: 300; color: #ddd; line-height: 1.6; }
+        
+        .btn {
+            display: inline-block; padding: 15px 45px; border: 2px solid #fff;
+            color: #fff; text-decoration: none; font-weight: 700; font-size: 12px;
+            text-transform: uppercase; transition: 0.3s; letter-spacing: 2px;
+        }
+        .btn:hover { background: #fff; color: #000; }
+
+        /* Biografía Específica */
+        #bio { background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070'); }
+        #m1 { background-image: url('https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070'); }
+        #m5 { background-image: url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070'); }
+        #m7 { background-image: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015'); }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scroll Snap para efecto SpaceX */
+        html { scroll-snap-type: y mandatory; }
+        .section { scroll-snap-align: start; }
+    </style>
 </head>
 <body>
 
-    <div class="contenedor">
-        <h1>Curso de Programación</h1>
-        <p>Selecciona un módulo:</p>
+    <header>
+        <a href="#" class="logo">PROMETHEUS LOGIC</a>
+        <nav>
+            <a href="biografia.html">Fundador</a>
+            <a href="modulo1.html">Módulos</a>
+            <a href="#m7">Estrategia</a>
+            <a href="mailto:tuemail@dominio.com">Contacto</a>
+        </nav>
+    </header>
 
-        <div class="modulos">
-            <a href="modulo1.html" class="boton">Módulo 1: Introducción</a>
-            <a href="modulo2.html" class="boton">Módulo 2: HTML</a>
-            <a href="modulo3.html" class="boton">Módulo 3: CSS</a>
+    <section id="bio" class="section">
+        <div class="overlay"></div>
+        <div class="content">
+            <span class="label">Estadístico & Especialista en IA</span>
+            <h2>Juan Pablo Jaramillo</h2>
+            <p>Nacido en Rionegro (1996), transformo operaciones mediante ciencia de datos e hiper-automatización. No solo diseño planos; ejecuto sistemas sostenibles, escalables y transparentes para el cliente final.</p>
+            <a href="biografia.html" class="btn">Ver Perfil</a>
         </div>
+    </section>
+
+    <section id="m1" class="section">
+        <div class="overlay"></div>
+        <div class="content">
+            <span class="label">Módulo 01</span>
+            <h2>Inmersión Generativa</h2>
+            <p>Domina el ecosistema de autores clave e ingeniería de prompts para activos de texto, imagen y video.</p>
+            <a href="modulo1.html" class="btn">Ingresar al Taller</a>
+        </div>
+    </section>
+
+    <section id="m5" class="section">
+        <div class="overlay"></div>
+        <div class="content">
+            <span class="label">Módulo 05</span>
+            <h2>Sistemas de Control e IA</h2>
+            <p>La fusión de la IA con sistemas clásicos (PID/PLC) y optimización predictiva basada en modelos (MPC).</p>
+            <a href="#" class="btn">Inscribirme al Taller</a>
+        </div>
+    </section>
+
+    <section id="m7" class="section">
+        <div class="overlay"></div>
+        <div class="content">
+            <span class="label">Módulo 07</span>
+            <h2>Transformación Operativa</h2>
+            <p>Del PoC al despliegue en producción (MLOps). Diseña la hoja de ruta para digitalizar áreas reales.</p>
+            <a href="#" class="btn">Finalizar Inscripción</a>
+        </div>
+    </section>
+<footer style="
+    background-color: #000; 
+    color: #555; 
+    padding: 60px 0 30px 0; 
+    text-align: center; 
+    font-size: 11px; 
+    letter-spacing: 2px; 
+    text-transform: uppercase;
+    border-top: 1px solid #111;">
+    
+    <div style="margin-bottom: 20px;">
+        <span style="color: #fff; font-weight: 700;">Prometheus Logic</span> &copy; 2026
     </div>
+    
+    <div style="font-weight: 300;">
+        Diseñado y Desarrollado por 
+        <a href="biografia.html" style="color: #888; text-decoration: none; border-bottom: 1px solid #333; transition: 0.3s;">
+            Juan Pablo Jaramillo
+        </a>
+    </div>
+    
+    <div style="margin-top: 40px; opacity: 0.5;">
+        Rionegro, Antioquia, CO
+    </div>
+</footer>
 
 </body>
 </html>
