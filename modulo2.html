@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 2: Fundamentos ML & DL | Prometheus Logic</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300&family=Roboto:wght@100;300;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        roboto: ['Roboto', 'sans-serif']
+                    },
+                    colors: {
+                        cyber: {
+                            dark: '#0f172a',
+                            card: '#1e293b',
+                            cyan: '#06b6d4',
+                            purple: '#d946ef',
+                            blue: '#3b82f6',
+                            green: '#10b981',
+                            red: '#f43f5e'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #000; color: #f1f5f9; line-height: 1.8; overflow-x: hidden; }
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); transition: 0.3s; }
+        .glass-card:hover { border-color: rgba(6, 182, 212, 0.3); }
+        .math-box { background: #050505; border-left: 3px solid #d946ef; padding: 20px; margin: 20px 0; border-radius: 0 4px 4px 0; font-family: 'JetBrains Mono', monospace; }
+        section { border-bottom: 1px solid #111; padding: 80px 10%; }
+        .text-gradient { background: linear-gradient(to right, #06b6d4, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .chapter-number { font-size: 8rem; line-height: 1; font-weight: 700; color: rgba(255,255,255,0.03); position: absolute; right: 20px; top: -40px; z-index: 0; pointer-events: none; }
+        .chart-container { position: relative; height: 300px; width: 100%; }
+        .key-term { color: #06b6d4; font-weight: bold; border-bottom: 1px dotted #06b6d4; cursor: help; }
+    </style>
+</head>
+<body class="antialiased font-roboto">
+
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur border-b border-white/10 px-8 py-4 flex justify-between items-center">
+        <a href="modulo1.html" class="text-xl font-bold tracking-tighter uppercase text-white">Prometheus <span class="text-cyber-cyan">Logic</span></a>
+        <div class="flex items-center gap-4">
+            <a href="modulo1.html" class="text-[10px] tracking-[2px] uppercase text-white/50 hover:text-white transition-all">← Módulo 1</a>
+            <a href="workshop_mod2.html" class="text-[10px] tracking-[2px] uppercase bg-cyber-purple/10 border border-cyber-purple text-cyber-purple px-4 py-2 hover:bg-cyber-purple hover:text-black transition-all font-bold">
+                🛠️ Ir al Workshop
+            </a>
+        </div>
+    </nav>
+
+    <header class="relative pt-20 pb-16 text-center overflow-hidden">
+        <div class="relative z-10">
+            <span class="text-cyber-purple text-xs tracking-[5px] uppercase mb-4 block">Módulo Técnico 02</span>
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tighter uppercase">Fundamentos de <br><span class="text-gradient">ML & Deep Learning</span></h1>
+            <p class="max-w-2xl mx-auto text-slate-400 font-light px-4">Entendiendo cómo las máquinas aprenden de los datos. De la estadística clásica a las redes neuronales profundas.</p>
+        </div>
+    </header>
+
+    <section id="cap1">
+        <div class="relative glass-card p-10 rounded-3xl overflow-hidden">
+            <span class="chapter-number">01</span>
+            <h2 class="text-2xl font-bold text-white uppercase mb-6 relative z-10"><span class="text-cyber-cyan">Capítulo 1:</span> ¿Cómo aprenden las máquinas?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
+                <div class="space-y-6">
+                    <p class="text-slate-300 font-light">Imagina que quieres enseñar a un niño a diferenciar frutas. Tienes dos formas de hacerlo, que definen los dos grandes paradigmas del Machine Learning:</p>
+                    
+                    <ul class="space-y-4">
+                        <li class="bg-white/5 p-4 rounded-lg border-l-2 border-cyber-cyan">
+                            <strong class="text-cyber-cyan block uppercase text-xs tracking-widest mb-1">Aprendizaje Supervisado</strong>
+                            Le muestras una manzana y le dices "Esto es una manzana". Le das los <strong>datos (X)</strong> y la <strong>respuesta correcta (Y)</strong>. El modelo trata de encontrar la función que conecta X con Y.
+                            <br><em class="text-xs text-slate-500">Ejemplo: Predecir el precio de una casa (Regresión) o si un correo es Spam (Clasificación).</em>
+                        </li>
+                        <li class="bg-white/5 p-4 rounded-lg border-l-2 border-cyber-purple">
+                            <strong class="text-cyber-purple block uppercase text-xs tracking-widest mb-1">Aprendizaje No Supervisado</strong>
+                            Le das una cesta con frutas mezcladas y le dices "Sepáralas por similitud". No hay etiquetas. El modelo busca <strong>patrones ocultos</strong> o estructuras.
+                            <br><em class="text-xs text-slate-500">Ejemplo: Segmentación de clientes (Clustering) o Detección de anomalías.</em>
+                        </li>
+                    </ul>
+                </div>
+                <div class="chart-container">
+                    <canvas id="learningChart"></canvas>
+                    <p class="text-center text-[10px] text-slate-500 mt-2 uppercase tracking-widest">Datos Etiquetados vs Agrupación</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="cap2" class="bg-[#020202]">
+        <div class="relative glass-card p-10 rounded-3xl overflow-hidden">
+            <span class="chapter-number">02</span>
+            <h2 class="text-2xl font-bold text-white uppercase mb-6 relative z-10"><span class="text-cyber-cyan">Capítulo 2:</span> Anatomía de una Neurona</h2>
+            
+            <p class="text-slate-300 mb-8 max-w-3xl">
+                En 1958, <strong>Frank Rosenblatt</strong> creó el <em>Perceptrón</em>, inspirado en la biología. Una neurona artificial es simplemente una calculadora matemática que toma decisiones basadas en la importancia (peso) de la información que recibe.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div>
+                    <h3 class="text-cyber-green text-sm font-bold uppercase tracking-widest mb-4">La Fórmula del Pensamiento</h3>
+                    <p class="text-sm text-slate-400 mb-4">El proceso consta de 3 pasos sencillos:</p>
+                    <ol class="list-decimal list-inside text-slate-300 space-y-2 text-sm mb-6 font-light">
+                        <li><strong>Input ($x$):</strong> Los datos de entrada (ej: píxeles de una imagen).</li>
+                        <li><strong>Peso ($w$):</strong> La importancia de ese dato. Si $w$ es alto, el dato es crucial.</li>
+                        <li><strong>Sesgo ($b$):</strong> El umbral de activación (como la personalidad base de la neurona).</li>
+                    </ol>
+                    
+                    <div class="math-box text-sm">
+                        <div class="text-xs text-slate-500 mb-2">// Suma Ponderada</div>
+                        \[ z = \sum (x_i \cdot w_i) + b \]
+                        <div class="text-xs text-slate-500 mt-4 mb-2">// Decisión (Función de Activación)</div>
+                        \[ y = \sigma(z) = \frac{1}{1 + e^{-z}} \]
+                    </div>
+                </div>
+
+                <div class="flex flex-col justify-center items-center bg-black/40 rounded-xl border border-white/5 p-6">
+                    <div class="w-full text-center mb-4">
+                        <span class="text-xs text-cyber-blue font-mono">VISUALIZACIÓN: FUNCIÓN SIGMOIDE</span>
+                    </div>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="sigmoidChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-4 text-center">La función Sigmoide "aplasta" cualquier número entre 0 y 1, convirtiendo matemáticas en probabilidad.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="cap3">
+        <div class="relative glass-card p-10 rounded-3xl overflow-hidden">
+            <span class="chapter-number">03</span>
+            <h2 class="text-2xl font-bold text-white uppercase mb-6 relative z-10"><span class="text-cyber-cyan">Capítulo 3:</span> Profundidad = Práctica</h2>
+            
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="md:w-1/2">
+                    <p class="text-slate-300 font-light mb-6">
+                        Una sola neurona es limitada. Pero si conectamos millones en "capas", obtenemos <strong>Deep Learning</strong>.
+                    </p>
+                    <p class="text-slate-300 font-light mb-6">
+                        ¿Cómo aprenden estas redes? Igual que un estudiante preparándose para un examen. 
+                    </p>
+                    <ul class="text-sm space-y-3 text-slate-400">
+                        <li class="flex items-start gap-3">
+                            <span class="text-cyber-cyan font-bold">1. Intento Inicial:</span> La red "adivina" al azar. Su precisión es baja.
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-cyber-cyan font-bold">2. Corrección:</span> Compara su respuesta con la real y ajusta sus neuronas.
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-cyber-cyan font-bold">3. Repetición (Epochs):</span> Tras miles de intentos, la red deja de adivinar y empieza a "entender".
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="md:w-1/2 bg-cyber-dark/50 p-6 rounded-xl border border-white/10 w-full">
+                    <h3 class="text-center text-white text-xs uppercase tracking-widest mb-2">Curva de Aprendizaje</h3>
+                    <p class="text-[10px] text-center text-slate-500 mb-4">Evolución de la "Inteligencia" con el tiempo</p>
+                    <div class="h-[250px]">
+                        <canvas id="accuracyChart"></canvas>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-slate-500 mt-4 px-4">
+                        <span>❌ Novato (Inicio)</span>
+                        <span>✅ Experto (Fin)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="cap4" class="bg-[#020202]">
+        <div class="relative glass-card p-10 rounded-3xl overflow-hidden">
+            <span class="chapter-number">04</span>
+            <h2 class="text-2xl font-bold text-white uppercase mb-6 relative z-10"><span class="text-cyber-cyan">Capítulo 4:</span> El Zoológico de Modelos</h2>
+            
+            <p class="text-slate-300 mb-10 text-center font-light">No usamos un martillo para cortar cristal. Cada tipo de dato requiere una arquitectura específica.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                <div class="border border-white/10 bg-white/5 p-6 rounded-xl hover:border-cyber-cyan transition-colors group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">👁️</div>
+                    <h3 class="text-white font-bold uppercase text-sm tracking-wider mb-2">CNN</h3>
+                    <p class="text-cyber-cyan text-xs font-mono mb-4">Convolutional Neural Networks</p>
+                    <p class="text-slate-400 text-xs leading-relaxed">
+                        Inspiradas en el ojo humano. Usan "filtros" para escanear imágenes.
+                        <br><br><strong>Uso:</strong> Reconocimiento facial, Rayos X, Coches autónomos.
+                    </p>
+                </div>
+
+                <div class="border border-white/10 bg-white/5 p-6 rounded-xl hover:border-cyber-purple transition-colors group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🗣️</div>
+                    <h3 class="text-white font-bold uppercase text-sm tracking-wider mb-2">Transformers</h3>
+                    <p class="text-cyber-purple text-xs font-mono mb-4">Attention Mechanisms</p>
+                    <p class="text-slate-400 text-xs leading-relaxed">
+                        Leen texto completo y entienden el contexto ("Atención"). Son el cerebro de ChatGPT.
+                        <br><br><strong>Uso:</strong> Chatbots, Traducción, Resúmenes.
+                    </p>
+                </div>
+
+                <div class="border border-white/10 bg-white/5 p-6 rounded-xl hover:border-cyber-green transition-colors group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">📊</div>
+                    <h3 class="text-white font-bold uppercase text-sm tracking-wider mb-2">Tabular / Trees</h3>
+                    <p class="text-cyber-green text-xs font-mono mb-4">XGBoost / Random Forest</p>
+                    <p class="text-slate-400 text-xs leading-relaxed">
+                        Para hojas de Excel. Crean miles de preguntas de Sí/No para decidir.
+                        <br><br><strong>Uso:</strong> Aprobar créditos bancarios, detectar fraude.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="cap5">
+        <div class="relative glass-card p-10 rounded-3xl overflow-hidden">
+            <span class="chapter-number">05</span>
+            <h2 class="text-2xl font-bold text-white uppercase mb-6 relative z-10"><span class="text-cyber-cyan">Capítulo 5:</span> Del Laboratorio a la Operación</h2>
+            
+            <p class="text-slate-300 font-light mb-8">
+                Como científico de datos en transformación digital, tu objetivo no es solo crear modelos, es generar valor. Así se ve el ML en el día a día operativo:
+            </p>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-400 border-collapse">
+                    <thead class="text-xs uppercase bg-white/5 text-cyber-cyan">
+                        <tr>
+                            <th class="px-6 py-4 rounded-tl-lg">Problema de Negocio</th>
+                            <th class="px-6 py-4">Tipo de Solución (ML)</th>
+                            <th class="px-6 py-4 rounded-tr-lg">Impacto Operativo</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/10">
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="px-6 py-4 font-bold text-white">¿Qué máquina se va a romper?</td>
+                            <td class="px-6 py-4 font-mono text-cyber-purple">Mantenimiento Predictivo (Clasificación/Regresión)</td>
+                            <td class="px-6 py-4">Reducción de downtime no planificado (-30%).</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="px-6 py-4 font-bold text-white">¿Qué cliente se va a ir?</td>
+                            <td class="px-6 py-4 font-mono text-cyber-purple">Churn Prediction (Clasificación Binaria)</td>
+                            <td class="px-6 py-4">Acciones de retención proactivas.</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="px-6 py-4 font-bold text-white">¿Cuánto stock necesito?</td>
+                            <td class="px-6 py-4 font-mono text-cyber-purple">Forecasting (Series de Tiempo)</td>
+                            <td class="px-6 py-4">Optimización de inventario y flujo de caja.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-12 text-center">
+                <a href="workshop_mod2.html" class="inline-block bg-cyber-cyan hover:bg-cyan-400 text-black font-bold uppercase tracking-widest py-4 px-10 rounded transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+                    Iniciar Workshop Práctico ⚡
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black py-20 text-center border-t border-white/5 font-roboto">
+        <div class="text-[20px] font-bold tracking-[10px] uppercase mb-4 text-white">Prometheus <span class="text-white/40 font-thin">Logic</span></div>
+        <p class="text-xs tracking-[4px] text-white/20 uppercase mb-12">Juan Pablo Jaramillo | Módulo 02 Finalizado</p>
+    </footer>
+
+    <script>
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.font.family = 'Outfit';
+
+        // 1. Chart: Supervised vs Unsupervised
+        const ctx1 = document.getElementById('learningChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Supervisado (Clase A)',
+                    data: [{x: 10, y: 20}, {x: 15, y: 25}, {x: 12, y: 22}],
+                    backgroundColor: '#06b6d4',
+                    pointRadius: 6
+                }, {
+                    label: 'Supervisado (Clase B)',
+                    data: [{x: 30, y: 50}, {x: 35, y: 55}, {x: 32, y: 52}],
+                    backgroundColor: '#d946ef',
+                    pointRadius: 6
+                }, {
+                    label: 'No Supervisado (Nuevo Dato)',
+                    data: [{x: 28, y: 48}],
+                    backgroundColor: '#ffffff',
+                    pointBorderColor: '#fff',
+                    pointRadius: 8,
+                    pointStyle: 'star'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: 'rgba(255,255,255,0.05)' }, display: false },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, display: false }
+                }
+            }
+        });
+
+        // 2. Chart: Sigmoid Function
+        const ctx2 = document.getElementById('sigmoidChart').getContext('2d');
+        const sigmoidData = [];
+        for (let i = -6; i <= 6; i += 0.5) {
+            sigmoidData.push(1 / (1 + Math.exp(-i)));
+        }
+        const labelsSig = Array.from({length: 25}, (_, i) => i - 6);
+        
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: labelsSig,
+                datasets: [{
+                    label: 'Activación',
+                    data: sigmoidData,
+                    borderColor: '#10b981',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { min: 0, max: 1, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    x: { display: false }
+                }
+            }
+        });
+
+        // 3. Chart: ACCURACY CURVE (NUEVO)
+        const ctx3 = document.getElementById('accuracyChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'line',
+            data: {
+                // Simulamos "Ciclos de estudio"
+                labels: ['Inicio', 'Intento 10', 'Intento 50', 'Intento 100', 'Intento 500', 'Final'],
+                datasets: [{
+                    label: '% de Aciertos (Inteligencia)',
+                    // Datos subiendo: 10% -> 30% -> 60% -> 80% -> 92% -> 98%
+                    data: [10, 30, 60, 80, 92, 98],
+                    borderColor: '#10b981', // Verde éxito
+                    backgroundColor: (context) => {
+                        const bg = context.chart.ctx.createLinearGradient(0, 0, 0, 300);
+                        bg.addColorStop(0, 'rgba(16, 185, 129, 0.5)'); // Verde brillante arriba
+                        bg.addColorStop(1, 'rgba(16, 185, 129, 0.0)'); // Transparente abajo
+                        return bg;
+                    },
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#10b981',
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: true, labels: { color: '#fff' } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + '% de Aciertos';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { 
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        min: 0,
+                        max: 100,
+                        ticks: { callback: function(value) { return value + '%' } }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
