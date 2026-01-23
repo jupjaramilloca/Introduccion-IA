@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller Práctico: Prompting | Prometheus Logic</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300;500&family=Roboto:wght@100;300;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        roboto: ['Roboto', 'sans-serif']
+                    },
+                    colors: {
+                        cyber: {
+                            dark: '#0f172a',
+                            card: '#1e293b',
+                            cyan: '#06b6d4',
+                            purple: '#d946ef',
+                            blue: '#3b82f6',
+                            green: '#10b981',
+                            red: '#f43f5e'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #000; color: #f1f5f9; line-height: 1.6; }
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); transition: transform 0.3s ease; }
+        .glass-card:hover { border-color: rgba(255, 255, 255, 0.15); }
+        .prompt-box { background: #050505; border: 1px solid #222; padding: 20px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; position: relative; overflow: hidden; }
+        .prompt-box::before { content: 'PROMPT'; position: absolute; top: 0; right: 0; background: #222; color: #777; font-size: 9px; padding: 2px 8px; font-weight: bold; }
+        section { border-bottom: 1px solid #111; padding: 80px 5%; }
+        .text-gradient { background: linear-gradient(to right, #06b6d4, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Utility for copy-paste selection */
+        .selectable { user-select: all; cursor: pointer; }
+        .selectable:active { background-color: #111; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    </style>
+</head>
+<body class="antialiased font-roboto">
+
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur border-b border-white/10 px-8 py-4 flex justify-between items-center">
+        
+        <span class="text-xl font-bold tracking-tighter uppercase text-white">Prometheus <span class="text-cyber-cyan">Logic</span></span>
+
+        <div class="flex items-center gap-4">
+            <div class="hidden md:block text-[10px] tracking-[2px] uppercase border border-white/10 px-4 py-2 text-white/30 cursor-default">
+                Modo Taller
+            </div>
+
+            <a href="modulo1.html" class="text-[10px] tracking-[2px] uppercase border border-cyber-purple/50 text-cyber-purple hover:bg-cyber-purple hover:text-black transition-all px-4 py-2 font-bold">
+                ← Volver al Módulo 1
+            </a>
+        </div>
+    </nav>
+
+    <header class="pt-24 pb-16 text-center">
+        <span class="text-cyber-cyan text-xs tracking-[5px] uppercase mb-4 block">Workshop Interactivo</span>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tighter uppercase">Tu Copiloto <br><span class="text-gradient">Digital</span></h1>
+        <p class="max-w-2xl mx-auto text-slate-400 font-light px-4">Recursos y plantillas para ingeniería de prompts aplicada al día a día.</p>
+    </header>
+
+    <section id="formula">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-2xl font-bold mb-10 border-l-4 border-cyber-cyan pl-6 uppercase tracking-widest text-white">La Fórmula R-C-T-R-F</h2>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="glass-card p-6 rounded-xl text-center border-t-2 border-t-cyber-purple">
+                    <div class="text-4xl font-bold text-white mb-2">R</div>
+                    <div class="text-xs uppercase tracking-widest text-cyber-purple font-bold">Rol</div>
+                    <p class="text-[10px] text-slate-400 mt-2">¿Quién es la IA?</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl text-center border-t-2 border-t-cyber-blue">
+                    <div class="text-4xl font-bold text-white mb-2">C</div>
+                    <div class="text-xs uppercase tracking-widest text-cyber-blue font-bold">Contexto</div>
+                    <p class="text-[10px] text-slate-400 mt-2">Situación actual</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl text-center border-t-2 border-t-white">
+                    <div class="text-4xl font-bold text-white mb-2">T</div>
+                    <div class="text-xs uppercase tracking-widest text-white font-bold">Tarea</div>
+                    <p class="text-[10px] text-slate-400 mt-2">Verbo de acción</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl text-center border-t-2 border-t-cyber-red">
+                    <div class="text-4xl font-bold text-white mb-2">R</div>
+                    <div class="text-xs uppercase tracking-widest text-cyber-red font-bold">Restricción</div>
+                    <p class="text-[10px] text-slate-400 mt-2">Límites y reglas</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl text-center border-t-2 border-t-cyber-green">
+                    <div class="text-4xl font-bold text-white mb-2">F</div>
+                    <div class="text-xs uppercase tracking-widest text-cyber-green font-bold">Formato</div>
+                    <p class="text-[10px] text-slate-400 mt-2">Entrega final</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="ejercicios">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-2xl font-bold mb-12 border-l-4 border-cyber-purple pl-6 uppercase tracking-widest text-white">Ejercicios Prácticos</h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16 items-start">
+                <div class="lg:col-span-1">
+                    <span class="text-cyber-cyan font-bold tracking-[2px] uppercase text-xs mb-2 block">Ejercicio 01</span>
+                    <h3 class="text-2xl font-bold text-white uppercase mb-4">El Correo Difícil</h3>
+                    <p class="text-slate-400 text-sm font-light">
+                        Usamos restricciones para controlar el tono de una negociación delicada. Observa cómo cambia la respuesta al prohibir palabras negativas.
+                    </p>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6 rounded-xl">
+                    <div class="prompt-box text-sm text-gray-300 selectable">
+<span class="text-cyber-purple font-bold"># ROL</span>
+Eres un negociador experto y empático.
+
+<span class="text-cyber-blue font-bold"># CONTEXTO</span>
+Un cliente me está pidiendo un descuento del 20% que no puedo darle porque mis costos operativos subieron este mes. Quiero mantener al cliente pero no puedo ceder en el precio.
+
+<span class="text-white font-bold"># TAREA</span>
+Redacta una respuesta de correo electrónico rechazando el descuento pero ofreciendo un valor agregado (como soporte extendido o una asesoría extra de 30 min).
+
+<span class="text-cyber-red font-bold"># RESTRICCIÓN</span>
+- No uses la palabra "No" directamente al inicio de las oraciones.
+- El texto debe tener menos de 100 palabras.
+- Mantén un tono colaborativo.
+
+<span class="text-cyber-green font-bold"># FORMATO</span>
+Texto plano listo para enviar.
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16 items-start">
+                <div class="lg:col-span-1">
+                    <span class="text-cyber-purple font-bold tracking-[2px] uppercase text-xs mb-2 block">Ejercicio 02</span>
+                    <h3 class="text-2xl font-bold text-white uppercase mb-4">Aprendizaje Acelerado</h3>
+                    <p class="text-slate-400 text-sm font-light">
+                        Técnica para entender conceptos complejos usando analogías. Ideal para estudiar temas nuevos rápidamente.
+                    </p>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6 rounded-xl">
+                    <div class="prompt-box text-sm text-gray-300 selectable">
+<span class="text-cyber-purple font-bold"># ROL</span>
+Eres un profesor experto de primaria con gran habilidad para crear metáforas simples.
+
+<span class="text-cyber-blue font-bold"># CONTEXTO</span>
+Estoy tratando de entender el concepto de "Redes Neuronales" (o inserta tu tema), pero las definiciones técnicas me confunden.
+
+<span class="text-white font-bold"># TAREA</span>
+Explícame cómo funciona este concepto paso a paso.
+
+<span class="text-cyber-red font-bold"># RESTRICCIÓN</span>
+- No uses terminología técnica matemática.
+- Usa una analogía relacionada con una orquesta musical o tráfico en una ciudad.
+
+<span class="text-cyber-green font-bold"># FORMATO</span>
+Una lista numerada con viñetas.
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div class="lg:col-span-1">
+                    <span class="text-cyber-green font-bold tracking-[2px] uppercase text-xs mb-2 block">Ejercicio 03</span>
+                    <h3 class="text-2xl font-bold text-white uppercase mb-4">Organización Estructurada</h3>
+                    <p class="text-slate-400 text-sm font-light">
+                        Cómo forzar a la IA a entregarnos datos estructurados para tomar acción inmediata, en lugar de texto plano.
+                    </p>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6 rounded-xl">
+                    <div class="prompt-box text-sm text-gray-300 selectable">
+<span class="text-cyber-purple font-bold"># ROL</span>
+Project Manager Senior certificado en metodologías Ágiles.
+
+<span class="text-cyber-blue font-bold"># CONTEXTO</span>
+Necesito organizar el lanzamiento de una pequeña campaña de marketing digital en 4 semanas.
+
+<span class="text-white font-bold"># TAREA</span>
+Crea un plan de acción regresivo (desde el lanzamiento hacia atrás).
+
+<span class="text-cyber-red font-bold"># RESTRICCIÓN</span>
+- Prioriza tareas de bajo costo.
+- Asume que solo hay 2 personas en el equipo.
+
+<span class="text-cyber-green font-bold"># FORMATO</span>
+Una tabla Markdown con las columnas: 
+| Semana | Acción Clave | Responsable | Prioridad (Alta/Media) |
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="cheatsheet" class="bg-[#020202]">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-2xl font-bold mb-10 border-l-4 border-white pl-6 uppercase tracking-widest text-white">Cheat Sheet: Inicios Rápidos</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-6 border-l-4 border-l-cyber-cyan flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-white font-bold uppercase tracking-wider text-sm mb-2">Para Mejorar Textos</h4>
+                        <p class="text-xs text-slate-500 mb-4">Cuando necesitas editar tono o forma.</p>
+                    </div>
+                    <code class="bg-black/50 p-3 rounded text-cyber-cyan text-xs font-mono block">"Actúa como un editor literario. Mejora la claridad de este párrafo manteniendo el mensaje original pero haciéndolo más persuasivo..."</code>
+                </div>
+
+                <div class="glass-card p-6 border-l-4 border-l-cyber-purple flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-white font-bold uppercase tracking-wider text-sm mb-2">Para Desbloqueo Creativo</h4>
+                        <p class="text-xs text-slate-500 mb-4">Cuando la página está en blanco.</p>
+                    </div>
+                    <code class="bg-black/50 p-3 rounded text-cyber-purple text-xs font-mono block">"Dame 10 ideas divergentes y poco convencionales para [tema]. Prioriza la cantidad sobre la calidad..."</code>
+                </div>
+
+                <div class="glass-card p-6 border-l-4 border-l-cyber-green flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-white font-bold uppercase tracking-wider text-sm mb-2">Para Resumir</h4>
+                        <p class="text-xs text-slate-500 mb-4">Extraer valor de mucho ruido.</p>
+                    </div>
+                    <code class="bg-black/50 p-3 rounded text-cyber-green text-xs font-mono block">"Analiza el siguiente texto y extrae solo: 1. Fechas límite, 2. Responsables, 3. Bloqueos mencionados..."</code>
+                </div>
+
+                <div class="glass-card p-6 border-l-4 border-l-cyber-blue flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-white font-bold uppercase tracking-wider text-sm mb-2">Para Programar/Excel</h4>
+                        <p class="text-xs text-slate-500 mb-4">Ayuda técnica.</p>
+                    </div>
+                    <code class="bg-black/50 p-3 rounded text-cyber-blue text-xs font-mono block">"Escribe una fórmula de Excel/Python que haga [X]. Explícame la lógica línea por línea..."</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black py-12 text-center border-t border-white/5 font-roboto mt-12">
+        <p class="text-xs tracking-[4px] text-white/30 uppercase">Prometheus Logic | Material de Clase | 2026</p>
+    </footer>
+
+</body>
+</html>

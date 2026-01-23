@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workshop: ML Fundamentals | Prometheus Logic</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        cyber: {
+                            cyan: '#06b6d4',
+                            purple: '#d946ef',
+                            green: '#10b981',
+                            red: '#f43f5e',
+                            yellow: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #000; color: #f1f5f9; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+        .glass-panel { background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); transition: 0.3s; }
+        .glass-panel:hover { border-color: rgba(6, 182, 212, 0.3); }
+        .input-cyber { background: #0f172a; border: 1px solid #334155; color: white; padding: 10px; font-family: 'JetBrains Mono', monospace; width: 100%; transition: 0.3s; border-radius: 4px; }
+        .input-cyber:focus { border-color: #06b6d4; outline: none; box-shadow: 0 0 10px rgba(6,182,212,0.2); }
+        .btn-cyber { background: #06b6d4; color: black; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; padding: 12px 24px; transition: 0.3s; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+        .btn-cyber:hover { background: #fff; box-shadow: 0 0 15px #06b6d4; }
+        .result-box { border-left: 4px solid #d946ef; background: rgba(217, 70, 239, 0.05); padding: 20px; margin-top: 20px; display: none; animation: fadeIn 0.5s ease; }
+        .explanation-title { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 8px; display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Range Slider Styling */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #06b6d4; cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px #06b6d4; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-5xl mx-auto">
+
+    <nav class="flex justify-between items-center mb-16 border-b border-white/10 pb-4 sticky top-0 bg-black/90 z-50 pt-4">
+        <div class="text-xl font-bold tracking-tighter uppercase text-white">Prometheus <span class="text-cyber-green">Workshop</span></div>
+        <a href="modulo2.html" class="text-[10px] tracking-[2px] uppercase border border-white/20 px-4 py-2 hover:bg-white hover:text-black transition-all">
+            ← Volver a Teoría
+        </a>
+    </nav>
+
+    <header class="text-center mb-20">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Laboratorio de Redes Neuronales</h1>
+        <p class="text-slate-400 max-w-2xl mx-auto">Bienvenido al simulador. Completaremos 5 ejercicios prácticos para entender qué ocurre dentro de la "Caja Negra" de la IA.</p>
+    </header>
+
+    <section class="glass-panel p-8 rounded-2xl mb-16 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-4 opacity-10 font-bold text-6xl text-cyber-cyan">01</div>
+        <div class="flex items-center gap-4 mb-6">
+            <span class="bg-cyber-cyan text-black font-bold px-2 py-1 text-xs rounded uppercase tracking-widest">Pre-Procesamiento</span>
+            <h2 class="text-2xl font-bold">El Problema de las Escalas (Normalización)</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div>
+                <p class="text-sm text-slate-400 mb-6 leading-relaxed">
+                    <strong>Contexto:</strong> Una red neuronal se confunde si le das números gigantes (Salario) mezclados con números pequeños (Edad). El número grande dominará la decisión erróneamente.
+                    <br><br>
+                    <strong>Misión:</strong> Observa cómo la red falla con datos crudos y arréglalo normalizando (poniendo todo entre 0 y 1).
+                </p>
+                
+                <div class="bg-black/40 p-4 rounded border border-white/5 mb-4 font-mono text-xs">
+                    <div class="flex justify-between mb-2"><span class="text-slate-500">Input 1: Edad</span> <span class="text-white">30 años</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Input 2: Salario</span> <span class="text-cyber-red font-bold">$5,000,000 COP</span></div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="runEx1('raw')" class="btn-cyber bg-slate-700 hover:bg-slate-600 border border-slate-500 text-white">Entrenar (Datos Crudos)</button>
+                    <button onclick="runEx1('norm')" class="btn-cyber">✨ Normalizar y Entrenar</button>
+                </div>
+            </div>
+            
+            <div id="ex1-result" class="result-box hidden">
+                <h3 id="ex1-title" class="font-bold text-lg mb-2"></h3>
+                <p id="ex1-text" class="text-sm text-slate-300 mb-4"></p>
+                <div class="explanation bg-black/20 p-4 rounded border-l-2 border-cyber-cyan">
+                    <span class="explanation-title">Explicación del Profesor:</span>
+                    <p class="text-xs text-slate-400 italic" id="ex1-explanation"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="glass-panel p-8 rounded-2xl mb-16 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-4 opacity-10 font-bold text-6xl text-cyber-purple">02</div>
+        <div class="flex items-center gap-4 mb-6">
+            <span class="bg-cyber-purple text-black font-bold px-2 py-1 text-xs rounded uppercase tracking-widest">Matemática</span>
+            <h2 class="text-2xl font-bold">La Neurona Manual</h2>
+        </div>
+
+        <p class="text-sm text-slate-400 mb-8">
+            <strong>Misión:</strong> Ajusta los pesos ($w$) para lograr que la neurona se ACTIVE (Output > 0.5). Imagina que $x_1$ es "Tiene Hambre" (1=Sí) y $x_2$ es "Tiene Dinero" (1=Sí). ¿Qué pesos necesita la neurona para decidir "Comer"?
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 items-end">
+            <div>
+                <label class="text-xs text-cyber-cyan font-bold block mb-2">Entrada 1 ($x_1$)</label>
+                <input type="number" id="x1" value="1" class="input-cyber mb-4">
+                <label class="text-xs text-cyber-purple font-bold block mb-2">Peso 1 ($w_1$)</label>
+                <input type="range" id="w1" min="-5" max="5" step="0.1" value="0.1" oninput="updateNeuronUI()">
+                <div class="text-right text-xs text-cyber-purple font-mono" id="w1-val">0.1</div>
+            </div>
+            <div>
+                <label class="text-xs text-cyber-cyan font-bold block mb-2">Entrada 2 ($x_2$)</label>
+                <input type="number" id="x2" value="1" class="input-cyber mb-4">
+                <label class="text-xs text-cyber-purple font-bold block mb-2">Peso 2 ($w_2$)</label>
+                <input type="range" id="w2" min="-5" max="5" step="0.1" value="0.1" oninput="updateNeuronUI()">
+                <div class="text-right text-xs text-cyber-purple font-mono" id="w2-val">0.1</div>
+            </div>
+            <div>
+                <label class="text-xs text-slate-500 font-bold block mb-2">Sesgo ($b$)</label>
+                <input type="number" id="b" value="-1" class="input-cyber mb-4">
+                <button onclick="calculateNeuron()" class="btn-cyber w-full">Calcular Activación</button>
+            </div>
+        </div>
+
+        <div id="ex2-result" class="result-box">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <span class="text-xs text-slate-500 block">Suma Ponderada ($z$)</span>
+                    <span id="z-val" class="font-mono text-white text-xl">0.00</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-500 block">Salida Final ($y$)</span>
+                    <span id="y-val" class="font-mono text-cyber-green text-3xl font-bold">0.00</span>
+                </div>
+            </div>
+            <div class="explanation bg-black/20 p-4 rounded border-l-2 border-cyber-purple">
+                <span class="explanation-title">Explicación del Profesor:</span>
+                <p class="text-xs text-slate-400 italic">
+                    La fórmula usada fue: $y = \frac{1}{1 + e^{-(x_1 \cdot w_1 + x_2 \cdot w_2 + b)}}$.
+                    <br>Si la suma ($z$) es positiva, la sigmoide da > 0.5 (Activado). Si es negativa, da < 0.5 (Apagado). El sesgo ($b$) negativo actúa como un freno: necesitas suficientes razones positivas (pesos altos) para superarlo.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="glass-panel p-8 rounded-2xl mb-16 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-4 opacity-10 font-bold text-6xl text-cyber-green">03</div>
+        <div class="flex items-center gap-4 mb-6">
+            <span class="bg-cyber-green text-black font-bold px-2 py-1 text-xs rounded uppercase tracking-widest">Entrenamiento</span>
+            <h2 class="text-2xl font-bold">El Montañista (Learning Rate)</h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <p class="text-sm text-slate-400 mb-6 leading-relaxed">
+                    <strong>Misión:</strong> Estás en la cima de una montaña de error y quieres bajar al valle (Error = 0). Tienes que decidir el tamaño de tus pasos (Learning Rate).
+                    <br><br>
+                    Intenta llegar al objetivo (Círculo Verde) en menos de 10 pasos.
+                </p>
+                <div class="space-y-4">
+                    <button onclick="step(0.1)" class="w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded border border-white/5 transition flex justify-between items-center group">
+                        <span>🐢 Pasos Pequeños (0.1)</span>
+                        <span class="text-xs text-slate-500 group-hover:text-white">Seguro pero lento</span>
+                    </button>
+                    <button onclick="step(0.8)" class="w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded border border-white/5 transition flex justify-between items-center group">
+                        <span>🚶 Pasos Medios (0.8)</span>
+                        <span class="text-xs text-slate-500 group-hover:text-white">Equilibrado</span>
+                    </button>
+                    <button onclick="step(2.5)" class="w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded border border-white/5 transition flex justify-between items-center group">
+                        <span>🐇 Pasos Gigantes (2.5)</span>
+                        <span class="text-xs text-slate-500 group-hover:text-white">Rápido pero riesgoso</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-black rounded-xl p-4 relative h-[250px] border border-white/10 flex items-center justify-center">
+                <div class="w-full h-1 bg-slate-700 absolute top-1/2 rounded"></div>
+                <div class="w-4 h-4 bg-cyber-green rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 shadow-[0_0_15px_#10b981]"></div>
+                <div id="player" class="w-6 h-6 bg-cyber-purple border-2 border-white rounded-full absolute top-1/2 left-[10%] transform -translate-y-1/2 transition-all duration-500 z-10"></div>
+                
+                <div class="absolute bottom-4 w-full text-center text-xs text-slate-500" id="step-status">Posición Inicial: 10%</div>
+            </div>
+        </div>
+        
+        <div id="ex3-feedback" class="result-box hidden mt-6">
+            <p id="ex3-msg" class="text-white font-bold mb-2"></p>
+            <div class="explanation bg-black/20 p-4 rounded border-l-2 border-cyber-green">
+                <span class="explanation-title">Explicación del Profesor:</span>
+                <p class="text-xs text-slate-400 italic">
+                    El "Learning Rate" es el hiperparámetro más importante. Si es muy bajo (0.1), la red tarda una eternidad en aprender (consume cómputo). Si es muy alto (2.5), la red "salta" sobre la solución y nunca converge (el error oscila). El éxito está en el equilibrio.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="glass-panel p-8 rounded-2xl mb-16 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-4 opacity-10 font-bold text-6xl text-cyber-yellow">04</div>
+        <div class="flex items-center gap-4 mb-6">
+            <span class="bg-cyber-yellow text-black font-bold px-2 py-1 text-xs rounded uppercase tracking-widest">Arquitectura</span>
+            <h2 class="text-2xl font-bold">Arquitecto de Soluciones</h2>
+        </div>
+
+        <p class="text-sm text-slate-400 mb-8">
+            <strong>Misión:</strong> Selecciona el "Cerebro" correcto para cada problema de negocio.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="border border-white/10 p-6 rounded bg-black/20">
+                <p class="mb-4 font-bold text-white text-sm">Caso A: Detección de cáncer en imágenes de radiografías.</p>
+                <select id="q1" class="input-cyber mb-4 text-xs">
+                    <option value="0">Seleccionar modelo...</option>
+                    <option value="rnn">Red Recurrente (RNN)</option>
+                    <option value="cnn">Red Convolucional (CNN)</option>
+                    <option value="linear">Regresión Lineal</option>
+                </select>
+                <button onclick="checkQuiz('q1', 'cnn')" class="text-xs border border-cyber-yellow text-cyber-yellow px-3 py-1 hover:bg-cyber-yellow hover:text-black transition">Validar</button>
+                <p class="feedback text-xs mt-3 hidden"></p>
+            </div>
+
+            <div class="border border-white/10 p-6 rounded bg-black/20">
+                <p class="mb-4 font-bold text-white text-sm">Caso B: Chatbot de atención al cliente automático.</p>
+                <select id="q2" class="input-cyber mb-4 text-xs">
+                    <option value="0">Seleccionar modelo...</option>
+                    <option value="kmeans">K-Means Clustering</option>
+                    <option value="cnn">Red Convolucional (CNN)</option>
+                    <option value="transformer">Transformer (LLM)</option>
+                </select>
+                <button onclick="checkQuiz('q2', 'transformer')" class="text-xs border border-cyber-yellow text-cyber-yellow px-3 py-1 hover:bg-cyber-yellow hover:text-black transition">Validar</button>
+                <p class="feedback text-xs mt-3 hidden"></p>
+            </div>
+
+            <div class="border border-white/10 p-6 rounded bg-black/20">
+                <p class="mb-4 font-bold text-white text-sm">Caso C: Segmentación de clientes (Sin etiquetas).</p>
+                <select id="q3" class="input-cyber mb-4 text-xs">
+                    <option value="0">Seleccionar modelo...</option>
+                    <option value="unsup">Clustering No Supervisado</option>
+                    <option value="sup">Regresión Supervisada</option>
+                    <option value="rl">Reinforcement Learning</option>
+                </select>
+                <button onclick="checkQuiz('q3', 'unsup')" class="text-xs border border-cyber-yellow text-cyber-yellow px-3 py-1 hover:bg-cyber-yellow hover:text-black transition">Validar</button>
+                <p class="feedback text-xs mt-3 hidden"></p>
+            </div>
+            
+            <div class="border border-white/10 p-6 rounded bg-cyber-yellow/5 flex items-center">
+                <div class="text-xs text-slate-300 italic">
+                    <strong class="text-cyber-yellow block mb-2 uppercase">Tip del Profesor:</strong>
+                    Si es Imagen = CNN.<br>
+                    Si es Texto/Secuencia = Transformer/RNN.<br>
+                    Si es Excel/Tablas = Árboles (XGBoost) o Redes simples.<br>
+                    Si no sabes qué buscas = No Supervisado.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="glass-panel p-8 rounded-2xl mb-16 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-4 opacity-10 font-bold text-6xl text-cyber-red">05</div>
+        <div class="flex items-center gap-4 mb-6">
+            <span class="bg-cyber-red text-black font-bold px-2 py-1 text-xs rounded uppercase tracking-widest">Evaluación</span>
+            <h2 class="text-2xl font-bold">La Paradoja de la Precisión</h2>
+        </div>
+
+        <p class="text-sm text-slate-400 mb-6">
+            <strong>Escenario:</strong> Creas un modelo para detectar una enfermedad rara (solo el 1% la tiene). Tu modelo es perezoso y simplemente dice "NADIE TIENE LA ENFERMEDAD" siempre.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div class="bg-black/40 p-6 rounded border border-white/5 text-center">
+                <h3 class="text-cyber-red font-bold uppercase text-sm tracking-widest mb-4">Modelo Perezoso</h3>
+                <div class="text-4xl font-mono text-white mb-2">99%</div>
+                <div class="text-xs text-slate-500 uppercase tracking-widest">Accuracy (Precisión Global)</div>
+                <button onclick="revealTruth()" class="mt-6 btn-cyber bg-slate-800 border-slate-600 text-white hover:bg-cyber-red hover:text-white">¿Es un buen modelo?</button>
+            </div>
+
+            <div id="truth-reveal" class="hidden">
+                <div class="bg-cyber-red/10 border border-cyber-red p-4 rounded mb-4">
+                    <strong class="text-cyber-red block text-sm mb-1">¡CUIDADO!</strong>
+                    <p class="text-xs text-slate-300">El modelo tiene 99% de Accuracy, pero <strong>0% de Recall</strong>. No detectó a ningún enfermo. Todos murieron.</p>
+                </div>
+                <div class="explanation bg-black/20 p-4 rounded border-l-2 border-cyber-red">
+                    <span class="explanation-title">Explicación del Profesor:</span>
+                    <p class="text-xs text-slate-400 italic">
+                        Nunca confíes solo en el "Accuracy" cuando los datos están desbalanceados. Necesitas mirar la <strong>Matriz de Confusión</strong>, el Recall (cuántos positivos encontré) y la Precisión (de los que dije que eran positivos, cuántos lo eran). En medicina, es mejor tener falsas alarmas que dejar pasar un enfermo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center pb-20 pt-10 border-t border-white/5">
+        <p class="text-xs tracking-[4px] text-white/20 uppercase">Prometheus Logic | Workshop Finalizado</p>
+    </footer>
+
+    <script>
+        // --- EJERCICIO 1: NORMALIZACION ---
+        function runEx1(mode) {
+            const box = document.getElementById('ex1-result');
+            const title = document.getElementById('ex1-title');
+            const text = document.getElementById('ex1-text');
+            const expl = document.getElementById('ex1-explanation');
+            
+            box.style.display = 'block';
+            box.classList.remove('hidden');
+
+            if (mode === 'raw') {
+                box.style.borderColor = '#f43f5e'; // Red
+                title.innerText = "❌ Resultado: Error de Entrenamiento";
+                title.className = "font-bold text-lg mb-2 text-cyber-red";
+                text.innerHTML = "La red asignó un peso de 0.0001 a la Edad y 0.99 al Salario. <br>El modelo ignoró la edad por completo porque el número del salario era matemáticamente abrumador.";
+                expl.innerText = "Las redes neuronales usan multiplicación de matrices. Si multiplicas por 5,000,000 el resultado explota (falla de gradiente). Al normalizar, ambos factores tienen la misma 'voz' en la decisión.";
+            } else {
+                box.style.borderColor = '#10b981'; // Green
+                title.innerText = "✅ Resultado: Convergencia Exitosa";
+                title.className = "font-bold text-lg mb-2 text-cyber-green";
+                text.innerHTML = "Datos transformados: Edad [0.3], Salario [0.5]. <br>La red aprendió correctamente utilizando ambas variables.";
+                expl.innerText = "¡Exacto! Al poner todo en una escala de 0 a 1 (Min-Max Scaling), permites que el algoritmo de optimización encuentre el mínimo global sin sesgarse por la magnitud de los números.";
+            }
+        }
+
+        // --- EJERCICIO 2: NEURONA ---
+        function updateNeuronUI() {
+            document.getElementById('w1-val').innerText = document.getElementById('w1').value;
+            document.getElementById('w2-val').innerText = document.getElementById('w2').value;
+        }
+
+        function calculateNeuron() {
+            const x1 = parseFloat(document.getElementById('x1').value);
+            const w1 = parseFloat(document.getElementById('w1').value);
+            const x2 = parseFloat(document.getElementById('x2').value);
+            const w2 = parseFloat(document.getElementById('w2').value);
+            const b = parseFloat(document.getElementById('b').value);
+
+            const z = (x1 * w1) + (x2 * w2) + b;
+            const y = 1 / (1 + Math.exp(-z));
+
+            document.getElementById('ex2-result').style.display = 'block';
+            document.getElementById('z-val').innerText = z.toFixed(2);
+            document.getElementById('y-val').innerText = y.toFixed(4);
+            
+            // Color feedback
+            const yEl = document.getElementById('y-val');
+            if(y > 0.5) {
+                yEl.className = "font-mono text-cyber-green text-3xl font-bold shadow-green-500/50 drop-shadow-lg";
+                yEl.innerHTML += " <span class='text-xs block'>⚡ ACTIVO</span>";
+            } else {
+                yEl.className = "font-mono text-slate-500 text-3xl font-bold";
+                yEl.innerHTML += " <span class='text-xs block'>💤 INACTIVO</span>";
+            }
+        }
+
+        // --- EJERCICIO 3: LEARNING RATE ---
+        let playerPos = 10; // 10%
+        function step(rate) {
+            const feedbackBox = document.getElementById('ex3-feedback');
+            const msg = document.getElementById('ex3-msg');
+            const player = document.getElementById('player');
+            const status = document.getElementById('step-status');
+            
+            feedbackBox.classList.remove('hidden');
+            feedbackBox.style.display = 'block';
+
+            // Simulación simple
+            if (rate === 0.1) {
+                playerPos += 10; // Avanza poco
+                msg.innerText = "Demasiado lento... Se nos acaba el presupuesto de cómputo (GPU).";
+                msg.style.color = "#f59e0b";
+            } else if (rate === 0.8) {
+                playerPos = 50; // Al centro (Objetivo)
+                msg.innerText = "¡PERFECTO! Convergencia lograda en tiempo récord.";
+                msg.style.color = "#10b981";
+            } else {
+                playerPos = 90; // Se pasa (Overshoot)
+                msg.innerText = "¡Te pasaste! El modelo divergió y el error aumentó.";
+                msg.style.color = "#f43f5e";
+            }
+            
+            player.style.left = playerPos + "%";
+            status.innerText = "Posición Actual: " + playerPos + "%";
+        }
+
+        // --- EJERCICIO 4: QUIZ ---
+        function checkQuiz(selectId, correctAnswer) {
+            const select = document.getElementById(selectId);
+            const feedback = select.nextElementSibling.nextElementSibling;
+            const val = select.value;
+            
+            feedback.classList.remove('hidden');
+            
+            if (val === correctAnswer) {
+                feedback.innerHTML = "✅ Correcto. Es la arquitectura estándar para este tipo de datos.";
+                feedback.className = "feedback text-xs mt-3 text-cyber-green font-bold";
+            } else {
+                feedback.innerHTML = "❌ Incorrecto. Revisa el tipo de dato (Imagen, Texto, Tabla).";
+                feedback.className = "feedback text-xs mt-3 text-cyber-red";
+            }
+        }
+
+        // --- EJERCICIO 5: EVALUATION ---
+        function revealTruth() {
+            document.getElementById('truth-reveal').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
