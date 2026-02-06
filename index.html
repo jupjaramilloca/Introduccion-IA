@@ -21,7 +21,7 @@
         nav a { color: #fff; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; opacity: 0.8; }
         nav a:hover { opacity: 1; }
 
-        /* Secciones Generales */
+        /* Estilos Generales (Tus estilos originales) */
         .section {
             height: 100vh; width: 100%; background-size: cover; background-position: center;
             display: flex; align-items: flex-end; padding: 80px 10%; position: relative;
@@ -41,18 +41,19 @@
         }
         .btn:hover { background: #fff; color: #000; }
 
-        /* Biografía Específica */
+        /* IMÁGENES DE FONDO */
         #bio { background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070'); }
-        #m1 { background-image: url('https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070'); }
+        #m1 { background-image: url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2070&auto=format&fit=crop'); }
         #m5 { background-image: url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070'); }
-        #m7 { background-image: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015'); }
+        
+        /* AQUÍ ESTÁ EL CAMBIO DE IMAGEN (SOLO LA URL) */
+        #m7 { background-image: url('https://images.unsplash.com/photo-1535378917042-95a2e313b996?q=80&w=2070&auto=format&fit=crop'); }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(40px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Scroll Snap para efecto SpaceX */
         html { scroll-snap-type: y mandatory; }
         .section { scroll-snap-align: start; }
     </style>
@@ -62,9 +63,9 @@
     <header>
         <a href="#" class="logo">PROMETHEUS LOGIC</a>
         <nav>
-            <a href="biografia.html">Fundador</a>
-            <a href="modulo1.html">Módulos</a>
-            <a href="#m7">Estrategia</a>
+            <a href="ejercicios_mod1.html">Prompt</a>
+            <a href="ejercicios_mod2.html">ML| Redes Neuronales</a>
+            <a href="workshop_vision.html">Detección de Objetos</a>
             <a href="mailto:jupjaramilloca@gmail.com">Contacto</a>
         </nav>
     </header>
@@ -99,40 +100,44 @@
         </div>
     </section>
 
-    <section id="m7" class="section">
-        <div class="overlay"></div>
-        <div class="content">
-            <span class="label">Módulo 03</span>
-            <h2>Transformación Operativa</h2>
-            <p>Del PoC al despliegue en producción (MLOps). Diseña la hoja de ruta para digitalizar áreas reales.</p>
-            <a href="#" class="btn">Finalizar Inscripción</a>
+<section id="m7" class="section" style="background-image: url('computer-vision.jpg');">
+    <div class="overlay"></div>
+    <div class="content">
+        <span class="label">Módulo 03</span>
+        <h2>Visión Artificial Aplicada</h2>
+        <p>
+            Dota a tus sistemas de la capacidad de "ver". Introducción a los fundamentos de la 
+            Visión por Computador: desde la convolución de imágenes hasta la detección de objetos en tiempo real.
+        </p>
+        <a href="Vision_x_computador.html" class="btn">Iniciar Workshop de Visión</a>
+    </div>
+</section>
+
+    <footer style="
+        background-color: #000; 
+        color: #555; 
+        padding: 60px 0 30px 0; 
+        text-align: center; 
+        font-size: 11px; 
+        letter-spacing: 2px; 
+        text-transform: uppercase;
+        border-top: 1px solid #111;">
+        
+        <div style="margin-bottom: 20px;">
+            <span style="color: #fff; font-weight: 700;">Prometheus Logic</span> &copy; 2026
         </div>
-    </section>
-<footer style="
-    background-color: #000; 
-    color: #555; 
-    padding: 60px 0 30px 0; 
-    text-align: center; 
-    font-size: 11px; 
-    letter-spacing: 2px; 
-    text-transform: uppercase;
-    border-top: 1px solid #111;">
-    
-    <div style="margin-bottom: 20px;">
-        <span style="color: #fff; font-weight: 700;">Prometheus Logic</span> &copy; 2026
-    </div>
-    
-    <div style="font-weight: 300;">
-        Diseñado y Desarrollado por 
-        <a href="biografia.html" style="color: #888; text-decoration: none; border-bottom: 1px solid #333; transition: 0.3s;">
-            Juan Pablo Jaramillo
-        </a>
-    </div>
-    
-    <div style="margin-top: 40px; opacity: 0.5;">
-        Rionegro, Antioquia, CO
-    </div>
-</footer>
+        
+        <div style="font-weight: 300;">
+            Diseñado y Desarrollado por 
+            <a href="biografia.html" style="color: #888; text-decoration: none; border-bottom: 1px solid #333; transition: 0.3s;">
+                Juan Pablo Jaramillo C
+            </a>
+        </div>
+        
+        <div style="margin-top: 40px; opacity: 0.5;">
+            Rionegro, Antioquia, CO
+        </div>
+    </footer>
 
 </body>
 </html>

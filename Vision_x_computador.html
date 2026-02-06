@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundamentos de Visión Artificial | Prometheus Logic</title>
+    
+    <!-- Core Styles & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- MathJax Configuration -->
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: { fontCache: 'global' }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        cyber: { dark: '#020202', card: '#0f172a', cyan: '#00f0ff', purple: '#bd00ff', green: '#00ff94', red: '#ff003c', yellow: '#facc15' }
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px)"
+                    },
+                    animation: {
+                        'scan': 'scan 2s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { top: '0%' },
+                            '100%': { top: '100%' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #020202; color: #e2e8f0; overflow-x: hidden; scroll-behavior: smooth; }
+        
+        /* Glassmorphism & Neon */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .neon-border-cyan { border-left: 3px solid #00f0ff; }
+        .neon-border-purple { border-left: 3px solid #bd00ff; }
+        .neon-border-red { border-left: 3px solid #ff003c; }
+        .neon-border-yellow { border-left: 3px solid #facc15; }
+        
+        .glow-text { text-shadow: 0 0 20px rgba(0, 240, 255, 0.5); }
+        .glow-box { box-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
+        
+        /* Matrix Grid Animation */
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #00ff94;
+        }
+        .matrix-cell {
+            background: rgba(0, 255, 148, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            aspect-ratio: 1;
+            transition: all 0.1s;
+            border-radius: 2px;
+            cursor: crosshair;
+        }
+
+        /* 3D YOLO Styles */
+        .yolo-scene {
+            perspective: 1000px;
+        }
+        .yolo-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .yolo-layer {
+            position: absolute;
+            inset: 0;
+            backface-visibility: visible;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s;
+        }
+        /* Active State for 3D View */
+        .yolo-active .yolo-container {
+            transform: rotateX(60deg) rotateZ(-20deg) scale(0.7) translateX(50px);
+        }
+        .yolo-active .layer-image { transform: translateZ(0px); opacity: 0.4; }
+        .yolo-active .layer-grid { transform: translateZ(100px); }
+        .yolo-active .layer-boxes { transform: translateZ(200px); }
+
+        .grid-cell {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.1s, border-color 0.1s;
+        }
+        .grid-cell:hover {
+            background-color: rgba(0, 240, 255, 0.2);
+            border-color: #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+        }
+
+        /* Data Bars */
+        .data-bar-bg { background: rgba(255,255,255,0.1); height: 4px; width: 100%; border-radius: 2px; overflow: hidden; }
+        .data-bar-fill { height: 100%; background: #00f0ff; width: 0%; transition: width 0.2s ease-out; }
+
+    </style>
+</head>
+<body class="antialiased">
+<body class="antialiased">
+
+    <a href="index.html" class="fixed top-6 left-6 z-[60] flex items-center gap-3 px-5 py-2 bg-black/40 border border-white/10 rounded-full text-slate-400 hover:text-cyber-cyan hover:border-cyber-cyan hover:bg-black/80 transition-all duration-300 backdrop-blur-md group no-underline">
+        <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform duration-300"></i>
+        <span class="font-mono text-xs font-bold tracking-widest uppercase">Inicio</span>
+    </a>
+
+    <nav class="fixed top-0 w-full z-50 glass-panel border-b-0 border-b-white/10">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between pl-32"> <div class="text-xl font-bold tracking-tighter text-white">
+                PROMETHEUS <span class="text-cyber-cyan">LOGIC</span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-mono text-slate-400">
+                <a href="#matrix" class="hover:text-cyber-cyan transition-colors">MATRIZ</a>
+                <a href="#filters" class="hover:text-cyber-cyan transition-colors">FILTROS</a>
+                <a href="#features" class="hover:text-cyber-cyan transition-colors">FEATURES</a>
+                <a href="#applications" class="hover:text-cyber-cyan transition-colors">APLICACIONES</a>
+                <a href="#yolo" class="text-cyber-red hover:text-white transition-colors">YOLO</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative min-h-[70vh] flex items-center justify-center overflow-hidden border-b border-white/10">
+        <div class="absolute inset-0 bg-grid-pattern opacity-20"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyber-purple/10 rounded-full blur-[120px]"></div>
+        
+        <div class="relative z-10 text-center px-4 flex flex-col items-center">
+            <div class="inline-block px-3 py-1 mb-8 border border-cyber-cyan/50 rounded-full bg-cyber-cyan/10 text-cyber-cyan font-mono text-xs tracking-widest uppercase">
+                Teoría Fundamental
+            </div>
+            <h1 class="text-6xl md:text-8xl font-bold text-white mb-12 tracking-tight glow-text leading-tight">
+                VISIÓN DE <br> MÁQUINA
+            </h1>
+            
+            <a href="workshop_vision.html" class="group relative px-8 py-4 bg-cyber-cyan text-black font-bold text-lg tracking-widest uppercase rounded hover:bg-white transition-all duration-300 transform hover:scale-105 glow-box no-underline">
+                <span class="relative z-10 flex items-center gap-3">
+                    Iniciar Workshop <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </span>
+                <div class="absolute inset-0 bg-white/50 rounded blur-lg opacity-0 group-hover:opacity-50 transition-opacity"></div>
+            </a>
+        </div>
+    </header>
+
+    <!-- SECTION 1: LA MATRIZ (Keep) -->
+    <section id="matrix" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
+                        <span class="text-cyber-green">01.</span> La Realidad Digital
+                    </h2>
+                    <p class="text-slate-400 text-lg mb-6 leading-relaxed">
+                        Lo que vemos como una imagen, la máquina lo ve como una <strong>Matriz de Intensidades</strong>.
+                    </p>
+                    <div class="glass-panel p-6 rounded-xl neon-border-cyan mb-6">
+                        <h3 class="text-cyber-cyan font-mono text-sm uppercase mb-2">Estructura de Datos</h3>
+                        <p class="text-slate-300 italic mb-4 text-sm">
+                            Cada píxel es un número (0-255).
+                        </p>
+                        <div class="bg-black/40 p-3 rounded text-center text-slate-200 text-sm font-mono">
+                            $$ I(x,y) \in [0, 255] $$
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matrix Visualizer -->
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-cyber-green/10 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="glass-panel p-4 rounded-xl relative">
+                        <div class="text-xs font-mono text-cyber-green mb-2 flex justify-between">
+                            <span>SENSOR_RAW_DATA</span>
+                            <span class="animate-pulse">● LIVE</span>
+                        </div>
+                        <div class="matrix-grid" id="matrixValues"></div>
+                    </div>
+                    <p class="text-center text-xs text-slate-500 mt-4 font-mono">Pasa el mouse para simular la luz excitando los sensores</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: PROCESAMIENTO Y NORMALIZACIÓN -->
+    <section class="py-24 bg-cyber-card border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-white mb-4"><span class="text-cyber-cyan">02.</span> Pipeline de Preprocesamiento</h2>
+                <p class="text-slate-400">Antes de la IA, debemos preparar los datos matemáticamente.</p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-4">
+                <!-- Step 1: Raw -->
+                <div class="glass-panel p-6 rounded-xl border border-white/5 relative">
+                    <div class="absolute -top-3 left-4 bg-cyber-dark px-2 text-xs font-mono text-slate-500">INPUT</div>
+                    <div class="h-32 bg-slate-800 rounded mb-4 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover opacity-80">
+                        <div class="absolute bottom-1 right-1 bg-black/50 text-[10px] text-white px-1">1920x1080 RGB</div>
+                    </div>
+                    <h3 class="text-white font-bold text-sm">Imagen Cruda</h3>
+                    <p class="text-slate-500 text-xs mt-2">Alta resolución, 3 canales de color, ruido presente.</p>
+                </div>
+
+                <!-- Step 2: Grayscale -->
+                <div class="glass-panel p-6 rounded-xl border border-white/5 relative">
+                    <div class="absolute top-1/2 -left-2 transform -translate-y-1/2 text-slate-600"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div class="absolute -top-3 left-4 bg-cyber-dark px-2 text-xs font-mono text-cyber-purple">STEP 1</div>
+                    <div class="h-32 bg-slate-800 rounded mb-4 overflow-hidden relative">
+                         <img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover grayscale contrast-125">
+                         <div class="absolute bottom-1 right-1 bg-black/50 text-[10px] text-white px-1">1 Channel</div>
+                    </div>
+                    <h3 class="text-white font-bold text-sm">Escala de Grises</h3>
+                    <p class="text-slate-500 text-xs mt-2">Reducción dimensional. El color suele ser irrelevante para formas.</p>
+                </div>
+
+                <!-- Step 3: Resize -->
+                <div class="glass-panel p-6 rounded-xl border border-white/5 relative">
+                    <div class="absolute top-1/2 -left-2 transform -translate-y-1/2 text-slate-600"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div class="absolute -top-3 left-4 bg-cyber-dark px-2 text-xs font-mono text-cyber-purple">STEP 2</div>
+                    <div class="h-32 flex items-center justify-center bg-black rounded mb-4">
+                        <div class="w-16 h-16 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=100&q=80" class="w-full h-full object-cover grayscale pixelated">
+                        </div>
+                        <div class="absolute bottom-2 right-2 bg-black/50 text-[10px] text-white px-1">224x224</div>
+                    </div>
+                    <h3 class="text-white font-bold text-sm">Redimensionado</h3>
+                    <p class="text-slate-500 text-xs mt-2">Estandarización del tamaño del tensor para la Red Neuronal.</p>
+                </div>
+
+                <!-- Step 4: Normalization -->
+                <div class="glass-panel p-6 rounded-xl border border-cyber-green/30 relative">
+                    <div class="absolute top-1/2 -left-2 transform -translate-y-1/2 text-slate-600"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div class="absolute -top-3 left-4 bg-cyber-dark px-2 text-xs font-mono text-cyber-green">OUTPUT</div>
+                    <div class="h-32 bg-slate-900 rounded mb-4 p-2 font-mono text-[10px] text-cyber-green overflow-hidden leading-tight break-all opacity-70">
+                        [0.02, 0.55, 0.91, 0.12, 0.00, 0.88, 0.34, 0.11, 0.99, 0.43, 0.22, 0.11...
+                    </div>
+                    <h3 class="text-white font-bold text-sm">Normalización</h3>
+                    <p class="text-slate-500 text-xs mt-2">Dividir por 255. Convertir a valores flotantes entre 0 y 1 para estabilidad matemática.</p>
+                    <div class="mt-2 text-[10px] bg-white/10 p-1 rounded font-mono text-center">$$ x' = x / 255 $$</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: FILTROS (Visuales Mejorados) -->
+    <section id="filters" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-white mb-10"><span class="text-cyber-cyan">03.</span> Filtros Digitales (Kernels)</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Filtro: Blur -->
+                <div class="group relative">
+                    <div class="h-48 rounded-t-xl overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover">
+                        <!-- Overlay de efecto -->
+                        <div class="absolute inset-0 w-1/2 h-full bg-white/0 backdrop-blur-[0px] border-r border-white/50"></div> <!-- Left side clear -->
+                        <div class="absolute inset-0 left-1/2 w-1/2 h-full backdrop-blur-sm bg-black/10"></div> <!-- Right side blurred -->
+                        <div class="absolute bottom-2 left-2 text-[10px] font-bold bg-black text-white px-2">ORIGINAL</div>
+                        <div class="absolute bottom-2 right-2 text-[10px] font-bold bg-cyber-cyan text-black px-2">GAUSSIAN</div>
+                    </div>
+                    <div class="glass-panel rounded-b-xl p-6 border-t-0">
+                        <h3 class="text-white font-bold mb-2">Gaussian Blur</h3>
+                        <p class="text-sm text-slate-400">Suaviza la imagen para eliminar "ruido" (píxeles erróneos) antes de procesar.</p>
+                    </div>
+                </div>
+
+                <!-- Filtro: Threshold -->
+                <div class="group relative">
+                    <div class="h-48 rounded-t-xl overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 left-1/2 w-1/2 h-full bg-black mix-blend-color"></div> <!-- Fake threshold effect via CSS is hard, simulating with overlay -->
+                        <div class="absolute inset-y-0 right-0 w-1/2 bg-black/90" style="mix-blend-mode: hard-light; filter: contrast(100);"></div>
+                        
+                        <!-- Better threshold simulation with image swap -->
+                         <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop" class="absolute inset-y-0 right-0 w-1/2 h-full object-cover" style="filter: grayscale(100%) contrast(500%);">
+
+                        <div class="absolute bottom-2 left-2 text-[10px] font-bold bg-black text-white px-2">GRAY</div>
+                        <div class="absolute bottom-2 right-2 text-[10px] font-bold bg-cyber-purple text-black px-2">BINARY</div>
+                    </div>
+                    <div class="glass-panel rounded-b-xl p-6 border-t-0">
+                        <h3 class="text-white font-bold mb-2">Thresholding</h3>
+                        <p class="text-sm text-slate-400">Binarización extrema. Convierte todo a Blanco o Negro puro para separar objetos del fondo.</p>
+                    </div>
+                </div>
+
+                <!-- Filtro: Canny -->
+                <div class="group relative">
+                    <div class="h-48 rounded-t-xl overflow-hidden relative bg-black">
+                        <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover opacity-50">
+                        <!-- Simulating edges with SVG or Filter -->
+                        <div class="absolute inset-y-0 right-0 w-1/2 h-full bg-black">
+                             <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover mix-blend-luminosity" style="filter: invert(1) grayscale(1) contrast(500%); opacity: 0.8;">
+                        </div>
+                        <div class="absolute bottom-2 left-2 text-[10px] font-bold bg-black text-white px-2">SOURCE</div>
+                        <div class="absolute bottom-2 right-2 text-[10px] font-bold bg-cyber-green text-black px-2">EDGES</div>
+                    </div>
+                    <div class="glass-panel rounded-b-xl p-6 border-t-0">
+                        <h3 class="text-white font-bold mb-2">Canny Edge</h3>
+                        <p class="text-sm text-slate-400">Detector de bordes. Elimina texturas y colores, dejando solo la estructura geométrica.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: EXTRACCIÓN DE CARACTERÍSTICAS (New) -->
+    <section id="features" class="py-24 bg-black relative border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-6"><span class="text-cyber-purple">04.</span> Extracción de Características</h2>
+                    <p class="text-slate-400 mb-4">
+                        ¿Cómo sabe la IA que una rueda es una rueda? Mediante la <strong>Convolución</strong>. 
+                    </p>
+                    <p class="text-slate-400 mb-6 text-sm">
+                        Un "Kernel" (filtro pequeño) se desliza sobre la imagen multiplicando valores. Si el patrón del Kernel coincide con la imagen, el resultado es alto (activación).
+                    </p>
+                    
+                    <div class="glass-panel p-6 rounded border-l-2 border-cyber-purple mb-6">
+                        <h4 class="text-cyber-purple font-mono text-sm mb-4 uppercase">Fórmula de Convolución Discreta</h4>
+                        <div class="text-center font-mono text-white text-lg">
+                             $$ (I * K)(i, j) = \sum_{m} \sum_{n} I(m, n) \cdot K(i-m, j-n) $$
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded border-l-2 border-slate-700">
+                        <h4 class="text-slate-400 font-mono text-xs mb-2 uppercase">Ejemplo: Kernel de Borde</h4>
+                        <div class="grid grid-cols-3 gap-1 w-24 mb-2 text-center font-mono text-xs text-white">
+                            <div class="bg-white/10 p-1">1</div><div class="bg-white/10 p-1">0</div><div class="bg-white/10 p-1">-1</div>
+                            <div class="bg-white/10 p-1">1</div><div class="bg-white/10 p-1">0</div><div class="bg-white/10 p-1">-1</div>
+                            <div class="bg-white/10 p-1">1</div><div class="bg-white/10 p-1">0</div><div class="bg-white/10 p-1">-1</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Animation Visual of Convolution -->
+                <div class="relative h-64 bg-slate-900 rounded-xl overflow-hidden border border-white/10 flex items-center justify-center">
+                    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')]"></div>
+                    
+                    <!-- Base Grid -->
+                    <div class="w-48 h-48 grid grid-cols-6 gap-0.5 bg-slate-800 p-0.5">
+                        <!-- Cells generated by loop ideally, doing static for structure -->
+                        <div class="bg-slate-700"></div><div class="bg-slate-700"></div><div class="bg-slate-600"></div><div class="bg-slate-200"></div><div class="bg-slate-200"></div><div class="bg-slate-700"></div>
+                        <div class="bg-slate-700"></div><div class="bg-slate-700"></div><div class="bg-slate-600"></div><div class="bg-slate-200"></div><div class="bg-slate-200"></div><div class="bg-slate-700"></div>
+                        <div class="bg-slate-700"></div><div class="bg-slate-700"></div><div class="bg-slate-600"></div><div class="bg-slate-200"></div><div class="bg-slate-200"></div><div class="bg-slate-700"></div>
+                        <div class="bg-slate-700"></div><div class="bg-slate-700"></div><div class="bg-slate-600"></div><div class="bg-slate-200"></div><div class="bg-slate-200"></div><div class="bg-slate-700"></div>
+                    </div>
+
+                    <!-- Sliding Kernel Window -->
+                    <div class="absolute w-24 h-24 border-2 border-cyber-purple shadow-[0_0_15px_#bd00ff] flex items-center justify-center animate-scan">
+                        <div class="text-cyber-purple font-bold text-xs bg-black/80 px-1">KERNEL</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: APLICACIONES (REIMAGINED: DIGITAL SIMULATIONS) -->
+    <section id="applications" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-white mb-10 text-center">Casos de Uso Reales (Simulación)</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                
+                <!-- Ganadería (Drone Grid) -->
+                <div class="glass-panel overflow-hidden rounded-xl hover:border-yellow-500/50 transition-colors">
+                    <div class="h-48 bg-slate-900 relative overflow-hidden flex flex-wrap gap-1 p-2 content-center justify-center">
+                        <!-- Abstract "Sheep" -->
+                        <div class="absolute inset-0" style="background-image: radial-gradient(#334155 1px, transparent 1px); background-size: 20px 20px; opacity: 0.5"></div>
+                        
+                        <!-- Dots simulating sheep -->
+                        <div class="w-1 h-1 bg-white rounded-full absolute top-10 left-10 opacity-70"></div>
+                        <div class="w-1 h-1 bg-white rounded-full absolute top-12 left-20 opacity-70"></div>
+                        <div class="w-1 h-1 bg-white rounded-full absolute top-24 left-14 opacity-70"></div>
+                        <div class="w-1 h-1 bg-white rounded-full absolute bottom-10 right-10 opacity-70"></div>
+                        <div class="w-1 h-1 bg-white rounded-full absolute bottom-20 right-20 opacity-70"></div>
+                        
+                        <!-- Bounding Boxes Overlay (CSS) -->
+                        <div class="absolute top-8 left-8 w-6 h-6 border border-yellow-500/80 shadow-[0_0_5px_rgba(234,179,8,0.5)]"></div>
+                        <div class="absolute top-10 left-18 w-6 h-6 border border-yellow-500/80 shadow-[0_0_5px_rgba(234,179,8,0.5)]" style="left: 4.5rem;"></div>
+                        <div class="absolute bottom-8 right-8 w-6 h-6 border border-yellow-500/80 shadow-[0_0_5px_rgba(234,179,8,0.5)]"></div>
+                        
+                        <div class="absolute top-2 right-2 text-[10px] font-mono text-yellow-500 bg-yellow-500/10 px-1 border border-yellow-500/30">DRONE_FEED_01</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">Inventario de Ganado Inteligente</h3>
+                        <p class="text-slate-400 text-sm">Visión computarizada aplicada a imágenes de drones para automatizar el conteo de cabezas, monitorear el bienestar animal y optimizar la rotación de pastos sin intervención manual.</p>
+                    </div>
+                </div>
+
+                <!-- Salud (Bio-Scan) -->
+                <div class="glass-panel overflow-hidden rounded-xl hover:border-blue-500/50 transition-colors">
+                    <div class="h-48 bg-slate-950 relative flex items-center justify-center overflow-hidden">
+                        <!-- Lung Representation (Icon) -->
+                         <i class="fa-solid fa-lungs text-8xl text-slate-800"></i>
+                         
+                         <!-- Heatmap Anomaly -->
+                         <div class="absolute w-12 h-12 bg-red-600 rounded-full blur-xl opacity-60 top-1/2 right-1/3 animate-pulse"></div>
+                         
+                         <!-- Grid Overlay -->
+                         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-10"></div>
+                         
+                         <div class="absolute bottom-2 right-2 text-red-500 font-mono text-[10px] border border-red-500/50 px-2 py-0.5 bg-red-900/20">ANOMALY DETECTED</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">Diagnóstico Asistido</h3>
+                        <p class="text-slate-400 text-sm">Mapas de calor sobre radiografías digitales para resaltar zonas sospechosas (neumonía/tumores).</p>
+                    </div>
+                </div>
+
+                <!-- Vehículos (Lidar) -->
+                <div class="glass-panel overflow-hidden rounded-xl hover:border-cyber-cyan/50 transition-colors">
+                    <div class="h-48 bg-slate-900 relative overflow-hidden flex flex-col items-center justify-center">
+                        <!-- Road -->
+                        <div class="w-32 h-full border-x-2 border-dashed border-slate-700 relative bg-slate-800/50">
+                            <!-- Moving Lines -->
+                            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-1 h-8 bg-slate-600"></div>
+                            <div class="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-1 h-8 bg-slate-600"></div>
+                            
+                            <!-- Car Object (Top Down) -->
+                            <div class="absolute top-10 left-2 w-10 h-16 bg-cyber-cyan/20 border border-cyber-cyan rounded-sm flex items-center justify-center">
+                                <span class="text-[8px] text-cyber-cyan font-mono">CAR</span>
+                            </div>
+                            
+                            <!-- Truck Object -->
+                            <div class="absolute bottom-4 right-2 w-12 h-24 bg-purple-500/20 border border-purple-500 rounded-sm flex items-center justify-center">
+                                <span class="text-[8px] text-purple-400 font-mono">TRUCK</span>
+                            </div>
+                        </div>
+                        <div class="absolute top-2 left-2 text-[10px] font-mono text-cyber-cyan bg-cyber-cyan/10 px-1 border border-cyber-cyan/30">LIDAR_STREAM</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">Aforo Vehicular</h3>
+                        <p class="text-slate-400 text-sm">Clasificación top-down para peajes inteligentes. Distingue tamaño y trayectoria para gestión de tráfico.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 6: YOLO DECONSTRUCTOR (THE SURPRISE) -->
+    <section id="yolo" class="py-24 bg-slate-950 border-t border-cyber-red/30 relative overflow-hidden">
+        <!-- Background Ambient -->
+        <div class="absolute inset-0 bg-cyber-red/5 blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-2 tracking-tight">
+                        <span class="text-cyber-red">MODELO:</span> YOLO ANALYSIS
+                    </h2>
+
+                </div>
+                <!-- 3D Toggle Button -->
+                <button id="toggle3D" class="mt-6 md:mt-0 px-6 py-2 border border-cyber-red text-cyber-red font-mono text-xs uppercase tracking-widest hover:bg-cyber-red hover:text-black transition-all flex items-center gap-2 group">
+                    <i class="fa-solid fa-cube"></i> <span id="btnText3D">ACTIVAR VISTA 3D</span>
+                </button>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8 h-[600px]">
+                
+                <!-- LEFT: DATA PANEL -->
+                <div class="lg:col-span-1 flex flex-col gap-4">
+                    <!-- Intro Card -->
+                    <div class="glass-panel p-6 rounded-xl border-l-4 border-cyber-red">
+                        <h3 class="text-white font-bold mb-2 text-sm">INFERENCIA EN TIEMPO REAL</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed mb-4">
+                            El modelo ha detectado 3 objetos clave en la imagen proporcionada. Pasa el cursor sobre la cuadrícula para ver qué neuronas se activan.
+                        </p>
+                        <div class="text-[10px] text-slate-500 font-mono">
+                            OBJETIVOS: PERSONA y AUTOS.
+                        </div>
+                    </div>
+
+                    <!-- Live Tensor Output -->
+                    <div class="glass-panel p-6 rounded-xl flex-1 flex flex-col justify-center relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-2 opacity-20 text-cyber-red text-4xl"><i class="fa-solid fa-microchip"></i></div>
+                        
+                        <div class="flex justify-between items-end mb-4 border-b border-white/10 pb-2">
+                            <span class="text-cyber-red font-mono text-xs font-bold">GRID_CELL [<span id="coordDisplay">0,0</span>]</span>
+                            <span class="text-slate-500 font-mono text-[10px]">TENSOR OUTPUT</span>
+                        </div>
+
+                        <!-- Vector Bars -->
+                        <div class="space-y-4 font-mono text-xs">
+                            <!-- Probabilidad (Pc) -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-white">Probabilidad (Pc)</span>
+                                    <span id="val-pc" class="text-cyber-green">0.00</span>
+                                </div>
+                                <div class="data-bar-bg"><div id="bar-pc" class="data-bar-fill bg-cyber-green"></div></div>
+                            </div>
+
+                            <!-- Bounding Box (XY) -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-white">Posición (bx, by)</span>
+                                    <span id="val-xy" class="text-cyber-cyan">0.0, 0.0</span>
+                                </div>
+                                <div class="data-bar-bg"><div id="bar-xy" class="data-bar-fill bg-cyber-cyan"></div></div>
+                            </div>
+
+                            <!-- Bounding Box (WH) -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-white">Tamaño (bw, bh)</span>
+                                    <span id="val-wh" class="text-cyber-purple">0.0, 0.0</span>
+                                </div>
+                                <div class="data-bar-bg"><div id="bar-wh" class="data-bar-fill bg-cyber-purple"></div></div>
+                            </div>
+
+                            <!-- Class Prob -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-white">Clase (Class_ID)</span>
+                                    <span id="val-class" class="text-white">NONE</span>
+                                </div>
+                                <div class="data-bar-bg"><div id="bar-class" class="data-bar-fill bg-white"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: INTERACTIVE SCENE -->
+                <div class="lg:col-span-2 yolo-scene bg-slate-900/50 rounded-xl border border-white/5 relative overflow-hidden group-hover-area">
+                    
+                    <div id="yoloContainer" class="yolo-container p-8 flex items-center justify-center">
+                        
+                        <!-- LAYER 1: IMAGE (INPUT) -->
+                        <div class="yolo-layer layer-image w-[90%] h-[90%] left-[5%] top-[5%] bg-black rounded shadow-2xl overflow-hidden border border-slate-700">
+                             <!-- CAMBIA ESTO: Tu archivo local 'reto_usuario_final.jpg' -->
+                             <!-- Si no existe, cargará el ejemplo de internet (onerror) -->
+                            <img src="ts.jpg" 
+                                 class="w-full h-full object-cover opacity-80 filter saturate-50 contrast-125"
+                                 onerror="this.src='https://images.unsplash.com/photo-1518717758536-85ae29035b6d?q=80&w=1000&auto=format&fit=crop'">
+                        </div>
+
+                        <!-- LAYER 2: GRID ($S \times S$) -->
+                        <div id="gridLayer" class="yolo-layer layer-grid w-[90%] h-[90%] left-[5%] top-[5%] grid grid-cols-7 grid-rows-7 z-20 pointer-events-auto">
+                            <!-- JS Generates Cells Here -->
+                        </div>
+
+                        <!-- LAYER 3: PREDICTIONS (Visual Feedback) -->
+                        <div class="yolo-layer layer-boxes w-[90%] h-[90%] left-[5%] top-[5%] pointer-events-none z-30">
+                            <!-- Dynamic Boxes appear here -->
+                            <div id="dynamicBox" class="absolute border-2 border-cyber-red bg-cyber-red/20 hidden transition-all duration-100 flex flex-col justify-between">
+                                <div class="bg-cyber-red text-white text-[10px] font-bold px-1 w-fit mt-[-15px]">DETECTED</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <!-- 3D Controls Hint -->
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 font-mono flex gap-4">
+                        <span><i class="fa-solid fa-mouse-pointer"></i> HOVER TO INSPECT</span>
+                        <span><i class="fa-solid fa-layer-group"></i> CLICK '3D' TO EXPLODE</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CIERRE ÉPICO -->
+    <section id="next-level" class="relative py-32 overflow-hidden flex items-center justify-center border-t border-white/10">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-cyber-cyan/10 via-transparent to-transparent"></div>
+        <div class="relative z-10 text-center max-w-3xl px-6">
+            <h2 class="text-5xl md:text-7xl font-bold text-white mb-8 tracking-tighter">
+                YA CONOCES LA <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan to-cyber-purple">TEORÍA</span>.
+            </h2>
+            <p class="text-xl text-slate-400 mb-12 font-light">
+                Entra al taller práctico donde aplicaremos estos conceptos para conocer en profundidad cómo funcionan los modelos de visión computarizada.
+            </p>
+ <a href="workshop_vision.html" class="group relative inline-flex items-center justify-center px-10 py-5 font-bold text-white transition-all duration-200 bg-transparent border-2 border-cyber-cyan hover:bg-cyber-cyan hover:text-black focus:outline-none ring-offset-2 focus:ring-2 ring-cyber-cyan no-underline">
+    <span class="text-lg tracking-widest uppercase">Vamos Ahora</span>
+    <i class="fa-solid fa-code ml-4"></i>
+    <div class="absolute -inset-3 rounded-lg bg-cyber-cyan/20 opacity-0 group-hover:opacity-100 blur transition-opacity duration-200"></div>
+</a>
+        </div>
+    </section>
+
+    <footer class="py-12 bg-cyber-card text-center text-slate-600 text-sm border-t border-white/5">
+        PROMETHEUS LOGIC | Workshop AI
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // --- MATRIX LOGIC (Top Section) ---
+        const matrixContainer = document.getElementById('matrixValues');
+        if(matrixContainer) {
+            for (let i = 0; i < 64; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'matrix-cell';
+                cell.innerText = Math.floor(Math.random() * 50);
+                cell.style.color = '#00442a';
+                matrixContainer.appendChild(cell);
+            }
+            matrixContainer.addEventListener('mousemove', (e) => {
+                const rect = matrixContainer.getBoundingClientRect();
+                const cells = document.querySelectorAll('.matrix-cell');
+                cells.forEach(cell => {
+                    const r = cell.getBoundingClientRect();
+                    const cx = r.left + r.width/2 - rect.left;
+                    const cy = r.top + r.height/2 - rect.top;
+                    const d = Math.sqrt(Math.pow((e.clientX - rect.left)-cx,2) + Math.pow((e.clientY - rect.top)-cy,2));
+                    const val = Math.floor(Math.pow(Math.max(0, 1 - d/150), 2) * 255);
+                    cell.innerText = val;
+                    cell.style.color = val > 100 ? '#fff' : '#00442a';
+                    cell.style.textShadow = val > 100 ? '0 0 10px #00ff94' : 'none';
+                    cell.style.transform = val > 100 ? 'scale(1.1)' : 'scale(1)';
+                });
+            });
+            matrixContainer.addEventListener('mouseleave', () => {
+                document.querySelectorAll('.matrix-cell').forEach(c => {
+                    c.style.color = '#00442a'; c.innerText = Math.floor(Math.random()*50); c.style.transform='scale(1)'; c.style.textShadow='none';
+                });
+            });
+        }
+
+        // --- YOLO DECONSTRUCTOR LOGIC ---
+        const gridLayer = document.getElementById('gridLayer');
+        const boxLayer = document.getElementById('dynamicBox');
+        
+        // CONFIGURACIÓN DE OBJETOS DETECTADOS (BOUNDING BOXES)
+        // CAMBIA ESTO: Ajusta las coordenadas (x,y) y tamaño (w,h) para que coincidan con tu imagen 'reto_usuario_final.jpg'.
+        // Nota: La cuadrícula es de 7x7 (indices 0 a 6).
+        
+        const yoloObjects = [
+            { x: 3, y: 6, w: 1.5, h: 3, class: 'PERSONA', conf: 0.98, color: 'border-cyber-yellow' }, // Objeto 1
+            { x: 3, y: 5, w: 2, h: 1, class: 'AUTO', conf: 0.94, color: 'border-cyber-cyan' }, // Objeto 2
+            { x: 2, y: 6, w: 2, h: 2, class: 'AUTO', conf: 0.88, color: 'border-cyber-purple' }   // Objeto 3
+        ];
+
+        // Generate Grid Cells
+        for(let y=0; y<7; y++) {
+            for(let x=0; x<7; x++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell w-full h-full cursor-crosshair';
+                cell.dataset.x = x;
+                cell.dataset.y = y;
+                
+                // Interaction
+                cell.addEventListener('mouseenter', () => {
+                    updateYoloData(x, y);
+                });
+
+                gridLayer.appendChild(cell);
+            }
+        }
+
+        // Reset on leave
+        gridLayer.addEventListener('mouseleave', () => {
+             updateBars(0, 0, 0, 0, 0, "NONE");
+             boxLayer.classList.add('hidden');
+        });
+
+        function updateYoloData(gx, gy) {
+            document.getElementById('coordDisplay').innerText = `${gx},${gy}`;
+            
+            // Check if this cell is responsible for an object
+            // (Simplificado: si la celda está cerca del centro del objeto)
+            const obj = yoloObjects.find(o => o.x === gx && o.y === gy);
+
+            if (obj) {
+                // High Confidence
+                updateBars(obj.conf, 0.5 + Math.random()*0.1, 0.5 + Math.random()*0.1, 0.8, 0.8, obj.class);
+                showBox(gx, gy, obj.w, obj.h, obj.color, obj.class);
+            } else {
+                // Noise / Low Confidence
+                updateBars(Math.random() * 0.1, Math.random(), Math.random(), Math.random(), Math.random(), "BACKGROUND");
+                boxLayer.classList.add('hidden');
+            }
+        }
+
+        function updateBars(pc, bx, by, bw, bh, cls) {
+            setBar('pc', pc);
+            setBar('xy', (bx+by)/2); // Avg for visuals
+            setBar('wh', (bw+bh)/2); // Avg for visuals
+            
+            // Values Text
+            document.getElementById('val-pc').innerText = pc.toFixed(2);
+            document.getElementById('val-xy').innerText = `${bx.toFixed(1)}, ${by.toFixed(1)}`;
+            document.getElementById('val-wh').innerText = `${bw.toFixed(1)}, ${bh.toFixed(1)}`;
+            document.getElementById('val-class').innerText = cls;
+            
+            // Bar Colors based on PC
+            const color = pc > 0.5 ? '#00f0ff' : '#334155';
+            document.getElementById('bar-pc').style.backgroundColor = pc > 0.5 ? '#00ff94' : '#334155';
+        }
+
+        function setBar(id, val) {
+            document.getElementById(`bar-${id}`).style.width = `${val * 100}%`;
+        }
+
+        function showBox(gx, gy, w, h, colorClass, label) {
+            boxLayer.classList.remove('hidden', 'border-cyber-cyan', 'border-cyber-purple', 'border-white', 'border-cyber-yellow');
+            // Calculate position % (each cell is ~14.28%)
+            const cellSize = 100/7;
+            
+            // Centered on the grid cell, extended by w/h relative to cell size
+            // Simplified positioning logic for visual effect
+            const top = (gy * cellSize) - ((h-1) * cellSize / 2);
+            const left = (gx * cellSize) - ((w-1) * cellSize / 2);
+            const width = w * cellSize;
+            const height = h * cellSize;
+
+            boxLayer.style.top = top + '%';
+            boxLayer.style.left = left + '%';
+            boxLayer.style.width = width + '%';
+            boxLayer.style.height = height + '%';
+            
+            // Add specific color class logic
+            let color = '#fff';
+            if (label === 'PERRO') color = '#facc15';
+            if (label === 'PERSONA') color = '#00f0ff';
+            if (label === 'AUTO') color = '#bd00ff';
+
+            boxLayer.style.borderColor = color;
+            boxLayer.querySelector('div').innerText = `${label} ${(Math.random()*0.1 + 0.9).toFixed(2)}`;
+            boxLayer.querySelector('div').style.backgroundColor = color;
+            
+            // Text color fix for yellow background
+            if (label === 'PERRO') boxLayer.querySelector('div').style.color = '#000';
+            else boxLayer.querySelector('div').style.color = '#fff';
+        }
+
+        // 3D Toggle Logic
+        let is3D = false;
+        const btn3D = document.getElementById('toggle3D');
+        const container = document.querySelector('.yolo-scene');
+        
+        btn3D.addEventListener('click', () => {
+            is3D = !is3D;
+            if(is3D) {
+                container.classList.add('yolo-active');
+                document.getElementById('btnText3D').innerText = "VOLVER A 2D";
+            } else {
+                container.classList.remove('yolo-active');
+                document.getElementById('btnText3D').innerText = "ACTIVAR VISTA 3D";
+            }
+        });
+
+    </script>
+</body>
+</html>
