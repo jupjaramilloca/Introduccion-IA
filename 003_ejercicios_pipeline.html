@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 4: Pipeline de Decisión | Prometheus Logic</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300;500;700&family=Roboto:wght@100;300;700&display=swap" rel="stylesheet">
+    
+    <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+      svg: { fontCache: 'global' }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        cyber: {
+                            dark: '#020202', card: '#0f172a', cyan: '#00f0ff', purple: '#bd00ff', green: '#00ff94', red: '#ff0055', yellow: '#facc15'
+                        }
+                    },
+                    animation: {
+                        'flow': 'flowAnimation 2s linear infinite',
+                    },
+                    keyframes: {
+                        flowAnimation: {
+                            '0%': { strokeDashoffset: '24' },
+                            '100%': { strokeDashoffset: '0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #020202; color: #e2e8f0; }
+        .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        
+        /* Scanline Effect */
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #00f0ff;
+            box-shadow: 0 0 15px #00f0ff;
+            z-index: 10;
+            top: 0;
+            left: 0;
+            transition: top 0.05s linear;
+        }
+        
+        .progress-bar { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyber-purple selection:text-white">
+
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur border-b border-white/5 px-6 py-4 flex justify-between items-center">
+        <span class="text-xl font-bold uppercase text-white">Prometheus <span class="text-cyber-purple">Logic</span></span>
+        <div class="flex gap-4 items-center">
+            <span class="hidden md:inline text-xs text-slate-500 uppercase tracking-widest">End-to-End Pipeline</span>
+            <div class="text-[10px] uppercase border border-cyber-purple/30 text-cyber-purple px-3 py-1 rounded bg-cyber-purple/5">
+                Módulo 04: Decisión
+            </div>
+        </div>
+    </nav>
+
+    <header class="py-16 text-center px-4 relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-cyber-purple/10 rounded-full blur-[120px] -z-10"></div>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 text-white">Del Píxel a la <span class="text-cyber-cyan">Decisión</span></h1>
+        <p class="text-slate-400 max-w-3xl mx-auto text-lg font-light">
+            Entendiendo la diferencia crítica: <br>
+            <span class="text-cyber-green font-bold">Clasificación</span> (¿Qué es?) vs <span class="text-cyber-purple font-bold">Segmentación</span> (¿Dónde está exactamente?).
+        </p>
+    </header>
+
+    <section class="max-w-7xl mx-auto px-4 mb-20">
+        <div class="glass-panel p-8 rounded-2xl border-t border-white/10">
+            <h2 class="text-xl font-bold text-white uppercase tracking-widest mb-8 border-l-4 border-cyber-cyan pl-4">Arquitectura End-to-End</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center text-center">
+                
+                <div class="relative group">
+                    <div class="w-16 h-16 mx-auto bg-slate-800 rounded border border-white/20 flex items-center justify-center text-2xl">📷</div>
+                    <p class="text-xs font-bold text-cyber-cyan mt-2 uppercase">Input</p>
+                    <p class="text-[10px] text-slate-500">Raw Tensor ($H \times W \times C$)</p>
+                </div>
+
+                <div class="hidden md:flex justify-center">
+                    <svg class="w-20 h-6 text-slate-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+
+                <div class="relative group">
+                    <div class="w-16 h-16 mx-auto bg-slate-900 rounded border border-cyber-green/50 flex flex-col items-center justify-center gap-1 shadow-[0_0_15px_rgba(0,255,148,0.2)]">
+                        <div class="w-10 h-1 bg-cyber-green/50 rounded"></div>
+                        <div class="w-8 h-1 bg-cyber-green/50 rounded"></div>
+                        <div class="w-6 h-1 bg-cyber-green/50 rounded"></div>
+                    </div>
+                    <p class="text-xs font-bold text-cyber-green mt-2 uppercase">Backbone</p>
+                    <p class="text-[10px] text-slate-500">Feature Extraction (Conv2D)</p>
+                </div>
+
+                <div class="hidden md:flex justify-center">
+                    <svg class="w-20 h-6 text-slate-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+
+                <div class="relative group">
+                    <div class="w-16 h-16 mx-auto bg-slate-900 rounded border border-cyber-purple/50 flex items-center justify-center text-cyber-purple font-mono font-bold text-lg shadow-[0_0_15px_rgba(189,0,255,0.2)]">
+                        FC
+                    </div>
+                    <p class="text-xs font-bold text-cyber-purple mt-2 uppercase">Head</p>
+                    <p class="text-[10px] text-slate-500">Softmax / Sigmoid Mask</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-4 pb-20">
+        
+        <div class="flex flex-col md:flex-row gap-6 mb-8 items-center justify-between">
+            <div>
+                <h2 class="text-3xl font-bold text-white mb-2">Simulación de Inferencia</h2>
+                <p class="text-slate-400 text-sm">Selecciona un caso de uso y activa el escáner para ver cómo la red segmenta y clasifica simultáneamente.</p>
+            </div>
+            
+            <div class="flex gap-2 bg-black/50 p-2 rounded-lg border border-white/10">
+                <button onclick="setScenario('industrial')" class="px-4 py-2 text-xs font-bold uppercase rounded bg-cyber-green/10 text-cyber-green border border-cyber-green/30 hover:bg-cyber-green hover:text-black transition">🏭 Industrial</button>
+                <button onclick="setScenario('medical')" class="px-4 py-2 text-xs font-bold uppercase rounded bg-cyber-purple/10 text-cyber-purple border border-cyber-purple/30 hover:bg-cyber-purple hover:text-black transition">🩻 Médico</button>
+                <button onclick="setScenario('satellite')" class="px-4 py-2 text-xs font-bold uppercase rounded bg-cyber-cyan/10 text-cyber-cyan border border-cyber-cyan/30 hover:bg-cyber-cyan hover:text-black transition">🛰️ Satelital</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-7 glass-panel p-1 rounded-xl relative overflow-hidden group">
+                <div class="relative h-[400px] w-full bg-black rounded-lg overflow-hidden border border-white/10" id="viewport">
+                    
+                    <canvas id="canvasBase" class="absolute top-0 left-0 w-full h-full object-cover"></canvas>
+                    
+                    <canvas id="canvasMask" class="absolute top-0 left-0 w-full h-full object-cover mix-blend-screen opacity-80"></canvas>
+                    
+                    <div id="scanLine" class="scan-line hidden"></div>
+
+                    <div class="absolute top-4 left-4 flex flex-col gap-1">
+                        <span class="bg-black/80 text-white text-[10px] px-2 py-1 rounded font-mono border border-white/10">FPS: 60</span>
+                        <span class="bg-black/80 text-cyber-cyan text-[10px] px-2 py-1 rounded font-mono border border-cyber-cyan/30">MODE: SEMANTIC SEGMENTATION</span>
+                    </div>
+
+                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2">
+                        <button onclick="runScan()" id="scanBtn" class="bg-white text-black font-bold uppercase tracking-widest text-xs px-8 py-3 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.4)] hover:scale-105 transition hover:shadow-[0_0_30px_rgba(0,240,255,0.6)]">
+                            ▶ Iniciar Análisis
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-l-cyber-green">
+                    <h3 class="text-white font-bold uppercase tracking-wider text-sm mb-4 flex justify-between">
+                        1. Clasificación (Global)
+                        <span class="text-[10px] text-slate-500 font-mono self-center">Softmax Output</span>
+                    </h3>
+                    
+                    <div id="classBars" class="space-y-4">
+                        </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-l-cyber-purple">
+                    <h3 class="text-white font-bold uppercase tracking-wider text-sm mb-4 flex justify-between">
+                        2. Segmentación (Local)
+                        <span class="text-[10px] text-slate-500 font-mono self-center">Pixel-wise Binary Mask</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-black/40 p-3 rounded border border-white/5">
+                            <span class="text-[10px] text-slate-400 uppercase block mb-1">Área Detectada</span>
+                            <span id="segArea" class="text-xl font-mono text-cyber-purple">0 px</span>
+                        </div>
+                        <div class="bg-black/40 p-3 rounded border border-white/5">
+                            <span class="text-[10px] text-slate-400 uppercase block mb-1">Confianza Media</span>
+                            <span id="segConf" class="text-xl font-mono text-white">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-xs text-slate-500 font-mono bg-black/20 p-2 rounded">
+                        Mask Shape: $(1, H, W)$ <br>
+                        Threshold: $> 0.5$
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="bg-black py-10 border-t border-white/10 mt-10">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <p class="text-xs font-mono text-slate-600 mb-4 uppercase tracking-widest">// Funciones de Activación Utilizadas //</p>
+            <div class="flex justify-center gap-12 text-slate-400 text-sm">
+                <div>
+                    <span class="text-cyber-green font-bold block mb-2">Clasificación</span>
+                    $$ \sigma(z)_i = \frac{e^{z_i}}{\sum_{j} e^{z_j}} $$
+                </div>
+                <div>
+                    <span class="text-cyber-purple font-bold block mb-2">Segmentación</span>
+                    $$ S(x) = \frac{1}{1 + e^{-x}} $$
+                </div>
+            </div>
+            <p class="text-[10px] text-slate-700 mt-8">PROMETHEUS LOGIC | MÓDULO 04 | 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        const canvasBase = document.getElementById('canvasBase');
+        const ctxBase = canvasBase.getContext('2d');
+        const canvasMask = document.getElementById('canvasMask');
+        const ctxMask = canvasMask.getContext('2d');
+        
+        let currentScenario = 'industrial';
+        let isScanning = false;
+
+        // Configuración de los Escenarios
+        const scenarios = {
+            industrial: {
+                classes: [
+                    { name: 'Engranaje OK', color: 'bg-slate-600', val: 5 },
+                    { name: 'Fisura (Defecto)', color: 'bg-cyber-red', val: 95 },
+                    { name: 'Mancha Aceite', color: 'bg-cyber-yellow', val: 15 }
+                ],
+                drawBase: (ctx, w, h) => {
+                    ctx.fillStyle = '#1e293b'; ctx.fillRect(0,0,w,h);
+                    // Engranaje
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.beginPath(); ctx.arc(w/2, h/2, 80, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(w/2, h/2, 20, 0, Math.PI*2); ctx.fill();
+                    // Dientes
+                    for(let i=0; i<360; i+=45){
+                        ctx.fillStyle = '#94a3b8';
+                        let rad = i * Math.PI/180;
+                        ctx.fillRect(w/2 + Math.cos(rad)*80 -10, h/2 + Math.sin(rad)*80 -10, 20, 30);
+                    }
+                    // Fisura (Crack)
+                    ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.moveTo(w/2 + 40, h/2 - 10); ctx.lineTo(w/2 + 70, h/2 + 20); ctx.stroke();
+                },
+                drawMask: (ctx, w, h) => {
+                    // Mascara sobre la fisura
+                    ctx.strokeStyle = '#ff0055'; ctx.lineWidth = 8; ctx.lineCap = 'round';
+                    ctx.beginPath(); ctx.moveTo(w/2 + 40, h/2 - 10); ctx.lineTo(w/2 + 70, h/2 + 20); ctx.stroke();
+                    // Glow
+                    ctx.shadowColor = '#ff0055'; ctx.shadowBlur = 20; ctx.stroke(); ctx.shadowBlur = 0;
+                },
+                area: "145 px²", conf: "98.4%"
+            },
+            medical: {
+                classes: [
+                    { name: 'Tejido Sano', color: 'bg-slate-600', val: 10 },
+                    { name: 'Neumonía', color: 'bg-cyber-cyan', val: 88 },
+                    { name: 'Tumor', color: 'bg-cyber-purple', val: 5 }
+                ],
+                drawBase: (ctx, w, h) => {
+                    ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
+                    // Pulmones
+                    ctx.fillStyle = '#333'; 
+                    ctx.beginPath(); ctx.ellipse(w/3, h/2, 50, 100, 0, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.ellipse(w*2/3, h/2, 50, 100, 0, 0, Math.PI*2); ctx.fill();
+                    // Costillas
+                    ctx.strokeStyle = '#555'; ctx.lineWidth = 5;
+                    for(let y=100; y<300; y+=30) {
+                        ctx.beginPath(); ctx.moveTo(50, y); ctx.quadraticCurveTo(w/2, y-20, w-50, y); ctx.stroke();
+                    }
+                    // Infección
+                    ctx.fillStyle = '#666'; ctx.globalAlpha = 0.5;
+                    ctx.beginPath(); ctx.arc(w*2/3 - 10, h/2 + 20, 30, 0, Math.PI*2); ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                },
+                drawMask: (ctx, w, h) => {
+                    ctx.fillStyle = 'rgba(6, 182, 212, 0.6)'; // Cyan transparente
+                    ctx.beginPath(); ctx.arc(w*2/3 - 10, h/2 + 20, 30, 0, Math.PI*2); ctx.fill();
+                    ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 2; ctx.stroke();
+                },
+                area: "2,340 px²", conf: "89.1%"
+            },
+            satellite: {
+                classes: [
+                    { name: 'Bosque', color: 'bg-cyber-green', val: 20 },
+                    { name: 'Agua', color: 'bg-cyber-cyan', val: 10 },
+                    { name: 'Carretera', color: 'bg-cyber-purple', val: 92 }
+                ],
+                drawBase: (ctx, w, h) => {
+                    ctx.fillStyle = '#064e3b'; ctx.fillRect(0,0,w,h); // Bosque
+                    // Rio
+                    ctx.fillStyle = '#1e3a8a'; 
+                    ctx.beginPath(); ctx.moveTo(0, h-50); ctx.bezierCurveTo(w/3, h-100, w*2/3, h, w, h-80); ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.fill();
+                    // Carretera
+                    ctx.strokeStyle = '#64748b'; ctx.lineWidth = 20;
+                    ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(w-50, h); ctx.stroke();
+                    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.setLineDash([10, 10]);
+                    ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(w-50, h); ctx.stroke(); ctx.setLineDash([]);
+                },
+                drawMask: (ctx, w, h) => {
+                    ctx.strokeStyle = 'rgba(189, 0, 255, 0.7)'; ctx.lineWidth = 20;
+                    ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(w-50, h); ctx.stroke();
+                },
+                area: "15.2 km²", conf: "94.5%"
+            }
+        };
+
+        function setScenario(type) {
+            currentScenario = type;
+            initCanvas();
+            resetUI();
+        }
+
+        function initCanvas() {
+            // Ajustar tamaño
+            const container = document.getElementById('viewport');
+            const w = container.offsetWidth;
+            const h = container.offsetHeight;
+            
+            canvasBase.width = w; canvasBase.height = h;
+            canvasMask.width = w; canvasMask.height = h;
+
+            // Dibujar Base
+            scenarios[currentScenario].drawBase(ctxBase, w, h);
+            
+            // Dibujar Máscara (pero borrarla inicialmente usando clearRect o similar, 
+            // aunque aquí la dibujaremos y la ocultaremos con CSS clip-path en la animación)
+            ctxMask.clearRect(0,0,w,h);
+            scenarios[currentScenario].drawMask(ctxMask, w, h);
+            
+            // Inicialmente ocultar la máscara completa
+            canvasMask.style.clipPath = 'polygon(0 0, 100% 0, 100% 0, 0 0)';
+        }
+
+        function resetUI() {
+            document.getElementById('segArea').innerText = "0 px";
+            document.getElementById('segConf').innerText = "0%";
+            
+            const barsContainer = document.getElementById('classBars');
+            barsContainer.innerHTML = '';
+            
+            scenarios[currentScenario].classes.forEach(c => {
+                const bar = `
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-300 font-bold">${c.name}</span>
+                            <span class="text-cyber-cyan font-mono prob-text" data-target="${c.val}">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div class="progress-bar ${c.color} h-full rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                `;
+                barsContainer.innerHTML += bar;
+            });
+        }
+
+        function runScan() {
+            if (isScanning) return;
+            isScanning = true;
+            
+            const line = document.getElementById('scanLine');
+            const btn = document.getElementById('scanBtn');
+            const mask = document.getElementById('canvasMask');
+            const height = document.getElementById('viewport').offsetHeight;
+            
+            line.classList.remove('hidden');
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            let pos = 0;
+            const speed = 4; // pixeles por frame
+
+            function step() {
+                pos += speed;
+                
+                // Mover línea
+                line.style.top = pos + 'px';
+                
+                // Revelar máscara progresivamente
+                let percentage = (pos / height) * 100;
+                mask.style.clipPath = `polygon(0 0, 100% 0, 100% ${percentage}%, 0 ${percentage}%)`;
+
+                // Actualizar barras de probabilidad gradualmente
+                updateProbabilities(percentage);
+
+                if (pos < height) {
+                    requestAnimationFrame(step);
+                } else {
+                    // Finalizar
+                    isScanning = false;
+                    line.classList.add('hidden');
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    
+                    // Mostrar datos finales
+                    document.getElementById('segArea').innerText = scenarios[currentScenario].area;
+                    document.getElementById('segConf').innerText = scenarios[currentScenario].conf;
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        function updateProbabilities(percentage) {
+            // Simular que la certeza aumenta a medida que el escáner baja
+            const bars = document.querySelectorAll('.progress-bar');
+            const texts = document.querySelectorAll('.prob-text');
+            
+            bars.forEach((bar, idx) => {
+                const targetVal = scenarios[currentScenario].classes[idx].val;
+                // La probabilidad actual es proporcional al % del escaneo
+                const currentVal = (targetVal * (percentage / 100)).toFixed(1);
+                
+                bar.style.width = currentVal + '%';
+                texts[idx].innerText = Math.floor(currentVal) + '%';
+            });
+        }
+
+        // Init
+        window.onload = () => {
+            initCanvas();
+            resetUI();
+            window.addEventListener('resize', initCanvas);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workshop: Visión Artificial | Prometheus Logic</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300;500&family=Roboto:wght@100;300;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        roboto: ['Roboto', 'sans-serif']
+                    },
+                    colors: {
+                        cyber: {
+                            dark: '#0f172a',
+                            card: '#1e293b',
+                            cyan: '#06b6d4',
+                            purple: '#d946ef',
+                            blue: '#3b82f6',
+                            green: '#10b981',
+                            red: '#f43f5e',
+                            orange: '#f97316'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #000; color: #f1f5f9; line-height: 1.6; }
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); transition: transform 0.3s ease; }
+        .glass-card:hover { border-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+        
+        /* Code Box Styling */
+        .code-box { background: #0d1117; border: 1px solid #30363d; padding: 20px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; position: relative; overflow: hidden; }
+        .code-box::before { content: 'PYTHON'; position: absolute; top: 0; right: 0; background: #238636; color: #fff; font-size: 10px; padding: 2px 10px; font-weight: bold; letter-spacing: 1px; }
+        
+        section { border-bottom: 1px solid #111; padding: 80px 5%; }
+        .text-gradient { background: linear-gradient(to right, #10b981, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .selectable { user-select: all; cursor: pointer; }
+        .selectable:active { background-color: #161b22; }
+        
+        /* Syntax Highlighting Colors */
+        .syn-kwd { color: #ff7b72; } /* Keyword */
+        .syn-func { color: #d2a8ff; } /* Function */
+        .syn-str { color: #a5d6ff; } /* String */
+        .syn-com { color: #8b949e; font-style: italic; } /* Comment */
+        .syn-num { color: #79c0ff; } /* Number */
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    </style>
+</head>
+<body class="antialiased font-roboto">
+
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur border-b border-white/10 px-8 py-4 flex justify-between items-center">
+        <span class="text-xl font-bold tracking-tighter uppercase text-white">Prometheus <span class="text-cyber-green">Logic</span></span>
+        <div class="flex items-center gap-4">
+            <div class="hidden md:block text-[10px] tracking-[2px] uppercase border border-white/10 px-4 py-2 text-white/30 cursor-default">
+                Lab Vision v1.0
+            </div>
+            <a href="#" class="text-[10px] tracking-[2px] uppercase border border-cyber-green/50 text-cyber-green hover:bg-cyber-green hover:text-black transition-all px-4 py-2 font-bold">
+                ← Home
+            </a>
+        </div>
+    </nav>
+
+    <header class="pt-24 pb-16 text-center">
+        <span class="text-cyber-green text-xs tracking-[5px] uppercase mb-4 block">Workshop Técnico</span>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tighter uppercase">Ojos de la <br><span class="text-gradient">Industria</span></h1>
+        <p class="max-w-2xl mx-auto text-slate-400 font-light px-4">Implementación de sistemas de visión artificial para inspección de calidad automatizada.</p>
+    </header>
+
+    <section id="pipeline">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-2xl font-bold mb-10 border-l-4 border-cyber-green pl-6 uppercase tracking-widest text-white">El Pipeline de Visión</h2>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="glass-card p-6 rounded-xl text-center border-t-2 border-t-white">
+                    <div class="text-4xl font-bold text-white mb-2">1</div>
+                    <div class="text-xs uppercase tracking-widest text-white font-bold">Input</div>
+                    <p class="text-[10px] text-slate-400 mt-2">Cámara / Sensor</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl text-center border-t-2 border-t-cyber-blue">
+                    <div class="text-4xl font-bold text-white mb-2">2</div>
+                    <div class="text-xs uppercase tracking-widest text-cyber-blue font-bold">Proceso</div>
+                    <p class="text-[10px] text-slate-400 mt-2">Filtros / Conv</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl text-center border-t-2 border-t-cyber-purple">
+                    <div class="text-4xl font-bold text-white mb-2">3</div>
+                    <div class="text-xs uppercase tracking-widest text-cyber-purple font-bold">Detectar</div>
+                    <p class="text-[10px] text-slate-400 mt-2">YOLO / CNNs</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl text-center border-t-2 border-t-cyber-orange">
+                    <div class="text-4xl font-bold text-white mb-2">4</div>
+                    <div class="text-xs uppercase tracking-widest text-cyber-orange font-bold">Analizar</div>
+                    <p class="text-[10px] text-slate-400 mt-2">Segmentación</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl text-center border-t-2 border-t-cyber-green">
+                    <div class="text-4xl font-bold text-white mb-2">5</div>
+                    <div class="text-xs uppercase tracking-widest text-cyber-green font-bold">Acción</div>
+                    <p class="text-[10px] text-slate-400 mt-2">Control Lógico</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="ejercicios">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-2xl font-bold mb-12 border-l-4 border-cyber-blue pl-6 uppercase tracking-widest text-white">Laboratorio Práctico</h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16 items-start">
+                <div class="lg:col-span-1">
+                    <span class="text-cyber-blue font-bold tracking-[2px] uppercase text-xs mb-2 block">Ejercicio 01</span>
+                    <h3 class="text-2xl font-bold text-white uppercase mb-4">El Filtro de Bordes</h3>
+                    <p class="text-slate-400 text-sm font-light mb-4">
+                        Aplicamos una operación de convolución manual usando un kernel de Sobel. Esto nos permite "ver" las grietas o bordes de una pieza mecánica antes de usar IA.
+                    </p>
+                    <ul class="text-xs text-slate-500 list-disc list-inside">
+                        <li>Concepto: Kernel 3x3</li>
+                        <li>Librería: OpenCV</li>
+                    </ul>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6 rounded-xl">
+                    <div class="code-box text-sm text-gray-300 selectable">
+<span class="syn-kwd">import</span> cv2
+<span class="syn-kwd">import</span> numpy <span class="syn-kwd">as</span> np
+
+<span class="syn-com"># 1. Definir Kernel Sobel (Detector de bordes verticales)</span>
+kernel_sobel = np.<span class="syn-func">array</span>([[-1, 0, 1],
+                         [-2, 0, 2],
+                         [-1, 0, 1]])
+
+<span class="syn-com"># 2. Cargar imagen en escala de grises</span>
+img = cv2.<span class="syn-func">imread</span>(<span class="syn-str">'pieza_metalica.jpg'</span>, 0)
+
+<span class="syn-com"># 3. Aplicar Convolución</span>
+resultado = cv2.<span class="syn-func">filter2D</span>(img, -1, kernel_sobel)
+
+<span class="syn-com"># 4. Mostrar resultado</span>
+cv2.<span class="syn-func">imshow</span>(<span class="syn-str">'Bordes Detectados'</span>, resultado)
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16 items-start">
+                <div class="lg:col-span-1">
+                    <span class="text-cyber-purple font-bold tracking-[2px] uppercase text-xs mb-2 block">Ejercicio 02</span>
+                    <h3 class="text-2xl font-bold text-white uppercase mb-4">Reconocimiento de Objetos</h3>
+                    <p class="text-slate-400 text-sm font-light mb-4">
+                        Implementación de un modelo SOTA (State of the Art) para detectar componentes electrónicos en una PCB en tiempo real.
+                    </p>
+                    <div class="text-xs font-mono bg-cyber-purple/10 text-cyber-purple p-2 mt-2 rounded border border-cyber-purple/20">
+                        Modelo: YOLOv8 Nano
+                    </div>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6 rounded-xl">
+                    <div class="code-box text-sm text-gray-300 selectable">
+<span class="syn-kwd">from</span> ultralytics <span class="syn-kwd">import</span> YOLO
+
+<span class="syn-com"># Cargar modelo pre-entrenado (ligero para CPU)</span>
+model = <span class="syn-func">YOLO</span>(<span class="syn-str">'yolov8n.pt'</span>) 
+
+<span class="syn-com"># Inferencia en imagen industrial</span>
+results = <span class="syn-func">model</span>(<span class="syn-str">'placa_circuito.jpg'</span>, conf=0.5)
+
+<span class="syn-com"># Visualizar detecciones (Bounding Boxes)</span>
+<span class="syn-kwd">for</span> r <span class="syn-kwd">in</span> results:
+    im_array = r.<span class="syn-func">plot</span>()  
+    <span class="syn-func">mostrar_imagen</span>(im_array) <span class="syn-com"># Función auxiliar</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16 items-start">
+                <div class="lg:col-span-1">
+                    <span class="text-cyber-orange font-bold tracking-[2px] uppercase text-xs mb-2 block">Ejercicio 03</span>
+                    <h3 class="text-2xl font-bold text-white uppercase mb-4">Segmentación Semántica</h3>
+                    <p class="text-slate-400 text-sm font-light">
+                        Ya no solo detectamos "dónde" está el objeto, sino "cuántos píxeles" ocupa. Crítico para medir áreas de corrosión o defectos de superficie.
+                    </p>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6 rounded-xl">
+                    <div class="code-box text-sm text-gray-300 selectable">
+<span class="syn-com"># Usamos modelo especializado en segmentación</span>
+model_seg = <span class="syn-func">YOLO</span>(<span class="syn-str">'yolov8n-seg.pt'</span>) 
+
+results = <span class="syn-func">model_seg</span>(<span class="syn-str">'metal_oxidado.jpg'</span>)
+
+<span class="syn-kwd">for</span> r <span class="syn-kwd">in</span> results:
+    <span class="syn-com"># Extraer máscaras binarias</span>
+    masks = r.masks 
+    
+    <span class="syn-kwd">if</span> masks <span class="syn-kwd">is not</span> None:
+        <span class="syn-com"># Calcular área del defecto (suma de píxeles activos)</span>
+        area_defecto = masks.data.<span class="syn-func">sum</span>() 
+        
+        <span class="syn-func">print</span>(f<span class="syn-str">"Área Afectada: {area_defecto} px"</span>)
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div class="lg:col-span-1">
+                    <span class="text-cyber-green font-bold tracking-[2px] uppercase text-xs mb-2 block">Ejercicio 04</span>
+                    <h3 class="text-2xl font-bold text-white uppercase mb-4">Semáforo de Calidad</h3>
+                    <p class="text-slate-400 text-sm font-light">
+                        Integración final. El sistema toma una decisión binaria (PASS/FAIL) basada en los datos extraídos por la IA.
+                    </p>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6 rounded-xl">
+                    <div class="code-box text-sm text-gray-300 selectable">
+<span class="syn-kwd">def</span> <span class="syn-func">control_calidad</span>(img_path):
+    results = <span class="syn-func">model</span>(img_path)
+    
+    <span class="syn-com"># Contar objetos detectados como 'defecto'</span>
+    num_defectos = <span class="syn-func">len</span>(results[0].boxes)
+    
+    <span class="syn-com"># Regla de Negocio</span>
+    <span class="syn-kwd">if</span> num_defectos > 2:
+        <span class="syn-func">print</span>(<span class="syn-str">"🔴 RECHAZADO: Exceso de fallas"</span>)
+        <span class="syn-func">activar_pistones_descarte</span>()
+    <span class="syn-kwd">else</span>:
+        <span class="syn-func">print</span>(<span class="syn-str">"🟢 APROBADO: Calidad OK"</span>)
+
+<span class="syn-func">control_calidad</span>(<span class="syn-str">'lote_actual_04.jpg'</span>)
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="toolkit" class="bg-[#020202]">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-2xl font-bold mb-10 border-l-4 border-white pl-6 uppercase tracking-widest text-white">Toolkit del Ingeniero</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-6 border-l-4 border-l-cyber-blue flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-white font-bold uppercase tracking-wider text-sm mb-2">OpenCV (cv2)</h4>
+                        <p class="text-xs text-slate-500 mb-4">Procesamiento clásico de imágenes.</p>
+                    </div>
+                    <code class="bg-black/50 p-3 rounded text-cyber-blue text-xs font-mono block">Manipulación de píxeles, filtros geométricos, transformaciones de color.</code>
+                </div>
+
+                <div class="glass-card p-6 border-l-4 border-l-cyber-purple flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-white font-bold uppercase tracking-wider text-sm mb-2">Ultralytics YOLO</h4>
+                        <p class="text-xs text-slate-500 mb-4">Deep Learning rápido.</p>
+                    </div>
+                    <code class="bg-black/50 p-3 rounded text-cyber-purple text-xs font-mono block">Detección de objetos en tiempo real, segmentación de instancias y clasificación.</code>
+                </div>
+
+                <div class="glass-card p-6 border-l-4 border-l-cyber-orange flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-white font-bold uppercase tracking-wider text-sm mb-2">Albumentations</h4>
+                        <p class="text-xs text-slate-500 mb-4">Robustez de datos.</p>
+                    </div>
+                    <code class="bg-black/50 p-3 rounded text-cyber-orange text-xs font-mono block">Data Augmentation para simular cambios de luz, ruido y rotaciones.</code>
+                </div>
+
+                <div class="glass-card p-6 border-l-4 border-l-cyber-green flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-white font-bold uppercase tracking-wider text-sm mb-2">Roboflow</h4>
+                        <p class="text-xs text-slate-500 mb-4">Gestión de Datasets.</p>
+                    </div>
+                    <code class="bg-black/50 p-3 rounded text-cyber-green text-xs font-mono block">Etiquetado colaborativo, control de versiones de datos y despliegue.</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black py-12 text-center border-t border-white/5 font-roboto mt-12">
+        <p class="text-xs tracking-[4px] text-white/30 uppercase">Prometheus Logic | Laboratorio de Visión Artificial | 2026</p>
+    </footer>
+
+</body>
+</html>

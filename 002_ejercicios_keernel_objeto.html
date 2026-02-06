@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 3: Laboratorio Visual Ultimate | Prometheus Logic</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300;500;700&family=Roboto:wght@100;300;700&display=swap" rel="stylesheet">
+    
+    <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+      svg: { fontCache: 'global' }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        cyber: {
+                            dark: '#050505', card: '#0f172a', cyan: '#00f0ff', purple: '#bd00ff', green: '#00ff94', red: '#ff0055'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #020202; color: #e2e8f0; }
+        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .neon-input { background: rgba(0,0,0,0.5); border: 1px solid #334155; color: #00f0ff; text-align: center; font-family: 'JetBrains Mono'; transition: 0.3s; }
+        .neon-input:focus { border-color: #00f0ff; box-shadow: 0 0 10px rgba(0,240,255,0.3); outline: none; }
+        canvas { image-rendering: pixelated; } /* Estilo retro-tech */
+    </style>
+</head>
+<body class="antialiased selection:bg-cyber-cyan selection:text-black">
+
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur border-b border-white/5 px-6 py-4 flex justify-between items-center">
+        <span class="text-xl font-bold uppercase text-white">Prometheus <span class="text-cyber-green">Logic</span></span>
+        <div class="text-[10px] uppercase border border-cyber-green/30 text-cyber-green px-3 py-1 rounded bg-cyber-green/5">
+            Lab Visual v2.0
+        </div>
+    </nav>
+
+    <header class="py-16 text-center px-4 relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-cyber-green/10 rounded-full blur-[100px] -z-10"></div>
+        <h1 class="text-4xl md:text-6xl font-bold mb-4 text-white">El "Microscopio" de la IA</h1>
+        <p class="text-slate-400 max-w-2xl mx-auto">Selecciona una imagen, aplica un Kernel matemático y observa cómo la computadora extrae patrones invisibles.</p>
+    </header>
+
+    <section class="max-w-7xl mx-auto px-4 pb-20">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="glass-panel p-6 rounded-xl">
+                <label class="text-xs font-bold text-cyber-green uppercase tracking-widest mb-3 block">1. Sujeto de Prueba (Input)</label>
+                <div class="flex gap-2">
+                    <button onclick="loadImage('cat')" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 p-3 rounded text-sm transition text-white">🐱 Gato</button>
+                    <button onclick="loadImage('shirt')" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 p-3 rounded text-sm transition text-white">👕 Camiseta</button>
+                    <button onclick="loadImage('brick')" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 p-3 rounded text-sm transition text-white">🧱 Ladrillos</button>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-xl">
+                <label class="text-xs font-bold text-cyber-purple uppercase tracking-widest mb-3 block">2. Filtro Matemático (Kernel)</label>
+                <select id="kernelSelect" onchange="loadPresetKernel()" class="w-full bg-black border border-white/20 text-white p-3 rounded text-sm focus:border-cyber-purple outline-none">
+                    <option value="sobel">Detección de Bordes (Sobel)</option>
+                    <option value="sharpen">Enfoque (Sharpen)</option>
+                    <option value="blur">Desenfoque (Box Blur)</option>
+                    <option value="edge_hard">Bordes Agresivos (Outline)</option>
+                    <option value="emboss">Repujado (Emboss)</option>
+                    <option value="identity">Identidad (Sin cambios)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-4 glass-panel p-6 rounded-xl h-fit border-t-2 border-t-cyber-purple">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-white font-bold uppercase tracking-wider text-sm">Matriz del Kernel ($K$)</h3>
+                    <span class="text-[10px] text-slate-500">Edita los valores para ver cambios</span>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3 max-w-[240px] mx-auto mb-8" id="kernelGrid">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="8" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                </div>
+
+                <div class="bg-black/50 p-4 rounded text-xs text-slate-400 font-mono leading-relaxed border border-white/5">
+                    <p class="mb-2"><strong class="text-cyber-purple">¿Qué está pasando?</strong></p>
+                    <p id="kernelDescription">
+                        Este filtro compara cada píxel con sus vecinos. Si hay mucha diferencia (un borde), el resultado es alto. Si son iguales, se anula.
+                    </p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 glass-panel p-6 rounded-xl border-t-2 border-t-cyber-green relative">
+                
+                <div class="grid grid-cols-2 gap-4 h-full">
+                    <div class="text-center">
+                        <span class="text-[10px] uppercase tracking-widest text-slate-500 mb-2 block">Imagen Original</span>
+                        <div class="relative group">
+                            <img id="sourceImage" src="" class="w-full rounded border border-white/10 hidden" crossorigin="anonymous">
+                            <canvas id="canvasOriginal" class="w-full rounded border border-white/10 bg-black"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <span class="text-[10px] uppercase tracking-widest text-cyber-green mb-2 block">Visión de la Máquina (Feature Map)</span>
+                        <div class="relative">
+                            <canvas id="canvasOutput" class="w-full rounded border border-cyber-green/30 bg-black shadow-[0_0_30px_rgba(0,255,148,0.1)]"></canvas>
+                            
+                            <div id="processingLabel" class="absolute top-2 right-2 bg-black/80 text-cyber-green text-[10px] px-2 py-1 rounded hidden">
+                                PROCESANDO...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-between items-end">
+                    <div class="text-xs text-slate-500 font-mono">
+                        Resolución de Análisis: <span class="text-white">300x300 px</span><br>
+                        Operaciones por segundo: <span class="text-white">~90,000 mul/add</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // 1. Data de Imágenes en Base64 (Para evitar problemas de CORS/Archivos externos)
+        const images = {
+            cat: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExMWFhUXGB8aGBgYGBsaHRsfIB0YHxkYGCAYHSggGBolHRgdITEhJSkrLi4uGh8zODMtNygtLisBCgoKDg0OGxAQGy0lICUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAMIBAwMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAADBAIFBgABB//EAD4QAAIBAwMCBAQDBgUEAgMBAAECEQADIQQSMSJBBTKUYRMUcYFCkaEGI7HB0fAzUmLh8QcVgvEkQ1Nykv/EABoBAAMBAQEBAAAAAAAAAAAAAAECAwQABQb/xAAuEQACAgICAgEDAwMFAQAAAAAAAQIRAyESMQRBEyJRYQVxgRQykaGx8MHR4fH/2gAMAwEAAhEDEQA/APi1SpUq6IwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXcc//2Q==", // Placeholder (En producción usar una real)
+            // Usaré URLs públicas confiables para el demo (Placeholders)
+            // Nota: En un entorno real, usa imágenes locales o Base64 completo.
+            // Para este ejemplo, usaré un Canvas generado dinámicamente para evitar CORS.
+        };
+
+        const canvasOriginal = document.getElementById('canvasOriginal');
+        const ctxOriginal = canvasOriginal.getContext('2d', { willReadFrequently: true });
+        const canvasOutput = document.getElementById('canvasOutput');
+        const ctxOutput = canvasOutput.getContext('2d');
+
+        // Configuración de Kernels
+        const kernels = {
+            sobel: [-1, 0, 1, -2, 0, 2, -1, 0, 1],
+            sharpen: [0, -1, 0, -1, 5, -1, 0, -1, 0],
+            blur: [1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9],
+            edge_hard: [-1, -1, -1, -1, 8, -1, -1, -1, -1],
+            emboss: [-2, -1, 0, -1, 1, 1, 0, 1, 2],
+            identity: [0, 0, 0, 0, 1, 0, 0, 0, 0]
+        };
+
+        const descriptions = {
+            sobel: "Detecta cambios bruscos de intensidad horizontalmente (bordes verticales).",
+            sharpen: "Aumenta el contraste entre píxeles adyacentes para 'enfocar' la imagen.",
+            blur: "Promedia los píxeles vecinos, suavizando el ruido y los detalles.",
+            edge_hard: "Versión agresiva que resalta cualquier cambio en todas las direcciones.",
+            emboss: "Crea un efecto de relieve 3D usando diferencias direccionales de luz.",
+            identity: "El píxel central se multiplica por 1 y el resto por 0. La imagen no cambia."
+        };
+
+        // Estado
+        let currentImageType = 'cat';
+
+        // Inicialización
+        window.onload = () => {
+            generateSyntheticImage('cat'); // Generamos imagen inicial
+            loadPresetKernel();
+        };
+
+        // 1. GENERADOR DE IMÁGENES SINTÉTICAS (Para evitar CORS y Base64 gigantes)
+        function generateSyntheticImage(type) {
+            currentImageType = type;
+            const w = 300, h = 300;
+            canvasOriginal.width = w; canvasOriginal.height = h;
+            canvasOutput.width = w; canvasOutput.height = h;
+
+            // Limpiar
+            ctxOriginal.fillStyle = "#1e1e1e";
+            ctxOriginal.fillRect(0, 0, w, h);
+
+            if (type === 'cat') {
+                // Dibujar un "Gato" abstracto (Formas con bordes claros)
+                ctxOriginal.fillStyle = "#e2e8f0"; // Cuerpo
+                ctxOriginal.beginPath(); ctxOriginal.arc(150, 180, 60, 0, Math.PI * 2); ctxOriginal.fill();
+                ctxOriginal.beginPath(); ctxOriginal.arc(150, 100, 40, 0, Math.PI * 2); ctxOriginal.fill(); // Cabeza
+                // Orejas (Triangulos = Bordes fuertes)
+                ctxOriginal.beginPath(); ctxOriginal.moveTo(120, 70); ctxOriginal.lineTo(110, 30); ctxOriginal.lineTo(140, 60); ctxOriginal.fill();
+                ctxOriginal.beginPath(); ctxOriginal.moveTo(180, 70); ctxOriginal.lineTo(190, 30); ctxOriginal.lineTo(160, 60); ctxOriginal.fill();
+                // Ojos
+                ctxOriginal.fillStyle = "#000"; 
+                ctxOriginal.beginPath(); ctxOriginal.arc(135, 95, 5, 0, Math.PI*2); ctxOriginal.fill();
+                ctxOriginal.beginPath(); ctxOriginal.arc(165, 95, 5, 0, Math.PI*2); ctxOriginal.fill();
+                // Bigotes (Lineas finas)
+                ctxOriginal.strokeStyle = "#fff"; ctxOriginal.lineWidth = 2;
+                ctxOriginal.beginPath(); ctxOriginal.moveTo(150, 110); ctxOriginal.lineTo(100, 100); ctxOriginal.stroke();
+                ctxOriginal.beginPath(); ctxOriginal.moveTo(150, 110); ctxOriginal.lineTo(200, 100); ctxOriginal.stroke();
+
+            } else if (type === 'shirt') {
+                // Dibujar textura de camiseta (Ruido + Patrón)
+                ctxOriginal.fillStyle = "#3b82f6";
+                ctxOriginal.fillRect(80, 50, 140, 200); // Base
+                // Cuello
+                ctxOriginal.fillStyle = "#1e1e1e";
+                ctxOriginal.beginPath(); ctxOriginal.arc(150, 50, 30, 0, Math.PI, false); ctxOriginal.fill();
+                // Textura (Rayas)
+                ctxOriginal.strokeStyle = "rgba(255,255,255,0.1)"; ctxOriginal.lineWidth = 2;
+                for(let i=60; i<250; i+=10) {
+                    ctxOriginal.beginPath(); ctxOriginal.moveTo(80, i); ctxOriginal.lineTo(220, i); ctxOriginal.stroke();
+                }
+
+            } else if (type === 'brick') {
+                // Pared de ladrillos (Bordes repetitivos)
+                ctxOriginal.fillStyle = "#7f1d1d"; // Rojo oscuro
+                for(let y=0; y<300; y+=30) {
+                    let offset = (y % 60 === 0) ? 0 : 15;
+                    for(let x=-15; x<300; x+=60) {
+                        ctxOriginal.fillRect(x + offset + 2, y + 2, 56, 26);
+                    }
+                }
+            }
+
+            applyKernelToCanvas();
+        }
+
+        function loadImage(type) {
+            generateSyntheticImage(type);
+        }
+
+        // 2. CARGAR PRESETS DE KERNEL
+        function loadPresetKernel() {
+            const select = document.getElementById('kernelSelect');
+            const kernelName = select.value;
+            const values = kernels[kernelName];
+            const inputs = document.querySelectorAll('#kernelGrid input');
+
+            // Actualizar descripción
+            document.getElementById('kernelDescription').innerText = descriptions[kernelName];
+
+            // Rellenar inputs
+            inputs.forEach((input, index) => {
+                input.value = values[index];
+                // Efecto visual si cambia drásticamente
+                input.classList.add('bg-cyber-purple/20');
+                setTimeout(() => input.classList.remove('bg-cyber-purple/20'), 300);
+            });
+
+            applyKernelToCanvas();
+        }
+
+        // 3. MOTOR DE CONVOLUCIÓN (Aquí ocurre la magia)
+        function applyKernelToCanvas() {
+            // Obtener valores actuales del Grid
+            const inputs = document.querySelectorAll('#kernelGrid input');
+            const kernel = Array.from(inputs).map(i => parseFloat(i.value));
+
+            // Obtener data de la imagen
+            const w = canvasOriginal.width;
+            const h = canvasOriginal.height;
+            if (w === 0) return;
+
+            const imgDataSrc = ctxOriginal.getImageData(0, 0, w, h);
+            const dataSrc = imgDataSrc.data;
+            const imgDataDst = ctxOutput.createImageData(w, h);
+            const dataDst = imgDataDst.data;
+
+            // Función auxiliar para obtener índice
+            const idx = (x, y) => (y * w + x) * 4;
+
+            // Recorrer píxeles (ignorar bordes para simplificar)
+            for (let y = 1; y < h - 1; y++) {
+                for (let x = 1; x < w - 1; x++) {
+                    let r = 0, g = 0, b = 0;
+
+                    // Aplicar Kernel 3x3
+                    let kIndex = 0;
+                    for (let ky = -1; ky <= 1; ky++) {
+                        for (let kx = -1; kx <= 1; kx++) {
+                            const pixelPos = idx(x + kx, y + ky);
+                            const weight = kernel[kIndex];
+                            
+                            r += dataSrc[pixelPos] * weight;
+                            g += dataSrc[pixelPos + 1] * weight;
+                            b += dataSrc[pixelPos + 2] * weight;
+                            kIndex++;
+                        }
+                    }
+
+                    // Asignar al destino (Clamp entre 0 y 255)
+                    const pos = idx(x, y);
+                    dataDst[pos] = Math.min(Math.max(r, 0), 255);
+                    dataDst[pos + 1] = Math.min(Math.max(g, 0), 255);
+                    dataDst[pos + 2] = Math.min(Math.max(b, 0), 255);
+                    dataDst[pos + 3] = 255; // Alpha
+                }
+            }
+
+            ctxOutput.putImageData(imgDataDst, 0, 0);
+        }
+
+    </script>
+</body>
+</html>

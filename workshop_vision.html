@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workshop Carousel | Prometheus Logic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { background-color: #020202; color: #e2e8f0; overflow: hidden; font-family: 'Outfit', sans-serif; }
+        
+        /* Botones de Navegación */
+        .nav-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 50px; height: 50px;
+            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s; z-index: 50; backdrop-filter: blur(5px);
+        }
+        .nav-arrow:hover { background: rgba(0, 240, 255, 0.2); border-color: #00f0ff; color: #00f0ff; box-shadow: 0 0 15px rgba(0,240,255,0.3); }
+        .nav-prev { left: 20px; }
+        .nav-next { right: 20px; }
+
+        /* Botón Volver a Teoría */
+        .btn-theory {
+            position: absolute; top: 20px; left: 20px; z-index: 50;
+            background: rgba(0,0,0,0.8); border: 1px solid #333; color: #888;
+            padding: 8px 16px; border-radius: 30px; font-size: 0.8rem; font-family: 'JetBrains Mono';
+            cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; text-decoration: none;
+        }
+        .btn-theory:hover { border-color: #bd00ff; color: #bd00ff; box-shadow: 0 0 10px rgba(189, 0, 255, 0.2); }
+
+        /* Indicadores (Puntitos abajo) */
+        .indicators {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 10px; z-index: 50;
+        }
+        .dot { width: 10px; height: 10px; background: #333; border-radius: 50%; cursor: pointer; transition: all 0.3s; }
+        .dot.active { background: #00f0ff; box-shadow: 0 0 10px #00f0ff; transform: scale(1.2); }
+
+        /* Pantalla del Proyector */
+        #proyector { width: 100%; height: 100vh; border: none; background: #050505; }
+        
+        /* Ocultar las textareas donde pegas el código */
+        .codigo-fuente { display: none; }
+
+        /* Animación */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <a href="Vision_x_computador.html" class="btn-theory">
+        <i class="fas fa-book"></i> VOLVER A TEORÍA
+    </a>
+
+    <div class="nav-arrow nav-prev" onclick="cambiarSlide(-1)"><i class="fas fa-chevron-left"></i></div>
+    <div class="nav-arrow nav-next" onclick="cambiarSlide(1)"><i class="fas fa-chevron-right"></i></div>
+
+    <div class="indicators">
+        <div class="dot active" onclick="irASlide(0)"></div>
+        <div class="dot" onclick="irASlide(1)"></div>
+        <div class="dot" onclick="irASlide(2)"></div>
+        <div class="dot" onclick="irASlide(3)"></div>
+    </div>
+
+    <div id="titulo-slide" class="absolute top-6 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-1 rounded border border-white/10 text-white/70 text-sm font-mono tracking-widest z-40 backdrop-blur pointer-events-none">
+        CARGANDO...
+    </div>
+
+    <div id="contenedor-pantalla" class="w-full h-full">
+        <iframe id="proyector" name="proyector"></iframe>
+    </div>
+
+    <textarea id="codigo-slide-0" class="codigo-fuente">
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 3: Visión Artificial Avanzada | Prometheus Logic</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300;500;700&family=Roboto:wght@100;300;700&display=swap" rel="stylesheet">
+    
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: { fontCache: 'global' }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        roboto: ['Roboto', 'sans-serif']
+                    },
+                    colors: {
+                        cyber: {
+                            dark: '#050505',
+                            card: '#0f172a',
+                            border: '#1e293b',
+                            cyan: '#00f0ff',
+                            purple: '#bd00ff',
+                            green: '#00ff94',
+                            red: '#ff0055'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #050505; color: #e2e8f0; overflow-x: hidden; }
+        
+        /* Glassmorphism Avanzado */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 40px -10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .neon-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
+            color: #00f0ff;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s ease;
+        }
+        .neon-input:focus {
+            border-color: #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            outline: none;
+        }
+
+        /* Utilidades de Texto */
+        .text-glow { text-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
+        .gradient-text { background: linear-gradient(135deg, #00f0ff 0%, #bd00ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyber-cyan selection:text-black">
+
+    <nav class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 bg-cyber-green rounded-full animate-pulse"></div>
+            <span class="text-xl font-bold tracking-tighter uppercase text-white">Prometheus <span class="text-cyber-cyan">Logic</span></span>
+        </div>
+        <div class="text-[10px] tracking-[2px] uppercase border border-cyber-cyan/30 text-cyber-cyan px-4 py-1 rounded-sm bg-cyber-cyan/5">
+            Laboratorio Visual
+        </div>
+    </nav>
+
+    <header class="relative pt-24 pb-20 px-6 border-b border-white/5 overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-cyber-purple/10 rounded-full blur-[120px] -z-10"></div>
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cyber-cyan/5 rounded-full blur-[100px] -z-10"></div>
+
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-white">
+                Deconstruyendo <br> <span class="gradient-text text-glow">La Realidad Digital</span>
+            </h1>
+            <p class="max-w-3xl mx-auto text-slate-400 font-light text-lg mb-10 leading-relaxed">
+                Entendiendo cómo las máquinas "ven" el mundo a través del Álgebra Lineal. <br>
+                Desde la matriz de píxeles hasta la extracción de características mediante convolución.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto text-xs font-mono text-cyber-cyan/70 uppercase tracking-widest">
+                <div class="border border-white/10 p-3 rounded bg-white/5">01. Ingesta de Datos (Tensores)</div>
+                <div class="border border-white/10 p-3 rounded bg-white/5">02. Feature Extraction (Kernels)</div>
+                <div class="border border-white/10 p-3 rounded bg-white/5">03. Inferencia (YOLO/Segmentación)</div>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center gap-4 mb-8">
+                <span class="bg-cyber-purple text-black font-bold px-3 py-1 text-xs rounded uppercase tracking-wider">Laboratorio Interactivo</span>
+                <h2 class="text-3xl font-bold text-white">Motor de Convolución en Tiempo Real</h2>
+            </div>
+            
+            <p class="text-slate-400 mb-10 max-w-3xl">
+                La convolución es el corazón de las Redes Neuronales Convolucionales (CNNs). Modifica los valores en la <strong>Matriz de Entrada</strong> (Imagen) o en el <strong>Kernel</strong> (Filtro) para ver cómo la matemática transforma la información.
+            </p>
+
+            <div class="glass-panel p-8 rounded-2xl border-t-2 border-cyber-purple">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    
+                    <div class="lg:col-span-4">
+                        <div class="text-center mb-4">
+                            <h3 class="text-white font-bold uppercase tracking-widest text-sm">Input ($I$)</h3>
+                            <span class="text-[10px] text-slate-500 font-mono">Región de 3x3 Píxeles (0-255)</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 max-w-[200px] mx-auto" id="inputMatrix">
+                            <input type="number" value="10" class="neon-input w-full h-12 rounded text-lg font-bold" oninput="calculateConv()">
+                            <input type="number" value="10" class="neon-input w-full h-12 rounded text-lg font-bold" oninput="calculateConv()">
+                            <input type="number" value="10" class="neon-input w-full h-12 rounded text-lg font-bold" oninput="calculateConv()">
+                            <input type="number" value="200" class="neon-input w-full h-12 rounded text-lg font-bold bg-white/10" oninput="calculateConv()">
+                            <input type="number" value="200" class="neon-input w-full h-12 rounded text-lg font-bold bg-white/10" oninput="calculateConv()">
+                            <input type="number" value="200" class="neon-input w-full h-12 rounded text-lg font-bold bg-white/10" oninput="calculateConv()">
+                            <input type="number" value="200" class="neon-input w-full h-12 rounded text-lg font-bold bg-white/10" oninput="calculateConv()">
+                            <input type="number" value="200" class="neon-input w-full h-12 rounded text-lg font-bold bg-white/10" oninput="calculateConv()">
+                            <input type="number" value="200" class="neon-input w-full h-12 rounded text-lg font-bold bg-white/10" oninput="calculateConv()">
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1 text-center">
+                        <div class="text-4xl text-slate-600 font-thin">×</div>
+                        <div class="text-[10px] text-cyber-cyan uppercase mt-2">Dot Product</div>
+                    </div>
+
+                    <div class="lg:col-span-3">
+                        <div class="text-center mb-4">
+                            <h3 class="text-white font-bold uppercase tracking-widest text-sm">Kernel ($K$)</h3>
+                            <span class="text-[10px] text-slate-500 font-mono">Filtro Sobel Vertical</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 max-w-[180px] mx-auto" id="kernelMatrix">
+                            <input type="number" value="-1" class="neon-input w-full h-12 rounded text-cyber-red font-bold" oninput="calculateConv()">
+                            <input type="number" value="0" class="neon-input w-full h-12 rounded text-slate-500" oninput="calculateConv()">
+                            <input type="number" value="1" class="neon-input w-full h-12 rounded text-cyber-green font-bold" oninput="calculateConv()">
+                            <input type="number" value="-2" class="neon-input w-full h-12 rounded text-cyber-red font-bold" oninput="calculateConv()">
+                            <input type="number" value="0" class="neon-input w-full h-12 rounded text-slate-500" oninput="calculateConv()">
+                            <input type="number" value="2" class="neon-input w-full h-12 rounded text-cyber-green font-bold" oninput="calculateConv()">
+                            <input type="number" value="-1" class="neon-input w-full h-12 rounded text-cyber-red font-bold" oninput="calculateConv()">
+                            <input type="number" value="0" class="neon-input w-full h-12 rounded text-slate-500" oninput="calculateConv()">
+                            <input type="number" value="1" class="neon-input w-full h-12 rounded text-cyber-green font-bold" oninput="calculateConv()">
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1 text-center">
+                        <div class="text-4xl text-slate-600 font-thin">=</div>
+                    </div>
+
+                    <div class="lg:col-span-3">
+                        <div class="text-center mb-4">
+                            <h3 class="text-white font-bold uppercase tracking-widest text-sm">Feature Map</h3>
+                            <span class="text-[10px] text-slate-500 font-mono">Nuevo valor del píxel central</span>
+                        </div>
+                        <div class="flex flex-col items-center justify-center h-full">
+                            <div id="resultBox" class="w-32 h-32 flex items-center justify-center bg-black border-2 border-cyber-cyan rounded-xl shadow-[0_0_30px_rgba(0,240,255,0.2)] transition-all duration-300">
+                                <span id="outputValue" class="text-4xl font-bold text-white font-mono">0</span>
+                            </div>
+                            <div id="resultLabel" class="mt-4 text-xs font-bold uppercase tracking-widest text-cyber-cyan">
+                                Analizando...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 bg-black/40 p-6 rounded-lg border border-white/5 font-mono text-xs md:text-sm text-slate-400">
+                    <p class="text-cyber-green mb-2 opacity-50">// CÁLCULO DETALLADO DEL SISTEMA:</p>
+                    <div id="calculationLog" class="leading-loose break-words">
+                        Esperando input...
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/5">
+                        <span class="text-white font-bold">Fórmula:</span> $$ S(i, j) = \sum_{m} \sum_{n} I(i-m, j-n) K(m, n) $$
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-cyber-card border-y border-white/5">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-white mb-12 text-center">El Pipeline de Inspección</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="glass-panel p-8 rounded-xl relative overflow-hidden group hover:border-cyber-green transition-all">
+                    <div class="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-12 h-12 text-cyber-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">1. Localización (YOLO)</h3>
+                    <p class="text-sm text-slate-400 mb-6">
+                        No basta con saber que hay un defecto, necesitamos coordenadas $(x, y, w, h)$. YOLO divide la imagen en una cuadrícula y predice bounding boxes.
+                    </p>
+                    <div class="bg-black p-4 rounded border border-white/10 font-mono text-xs text-cyber-green">
+                        [<br>
+                        &nbsp;&nbsp;{ "class": "scratch", "conf": 0.92, "box": [102, 45, 20, 10] },<br>
+                        &nbsp;&nbsp;{ "class": "dent", "conf": 0.88, "box": [210, 15, 50, 50] }<br>
+                        ]
+                    </div>
+                </div>
+
+                <div class="glass-panel p-8 rounded-xl relative overflow-hidden group hover:border-cyber-purple transition-all">
+                    <div class="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-12 h-12 text-cyber-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">2. Cuantificación (Segmentation)</h3>
+                    <p class="text-sm text-slate-400 mb-6">
+                        Para medir el tamaño exacto del daño, clasificamos píxel por píxel. Útil para calcular % de corrosión.
+                    </p>
+                    <div class="bg-black p-4 rounded border border-white/10 font-mono text-xs text-cyber-purple">
+                        mask = model.predict(img)<br>
+                        area = np.sum(mask == 1)<br>
+                        print(f"Área Dañada: {area} px²")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black py-16 border-t border-white/10 text-center">
+        <p class="text-xs tracking-[4px] text-white/30 uppercase mb-4">Prometheus Logic</p>
+        <p class="text-slate-600 text-sm">Laboratorio de Inteligencia Artificial</p>
+    </footer>
+
+    <script>
+        function calculateConv() {
+            // 1. Obtener Inputs de la Matriz de Imagen
+            const inputInputs = document.querySelectorAll('#inputMatrix input');
+            const kernelInputs = document.querySelectorAll('#kernelMatrix input');
+            
+            let sum = 0;
+            let logHTML = "<span class='text-slate-500'>[ </span>";
+
+            // 2. Iterar y calcular Producto Punto
+            for (let i = 0; i < 9; i++) {
+                const valI = parseInt(inputInputs[i].value) || 0;
+                const valK = parseInt(kernelInputs[i].value) || 0;
+                const product = valI * valK;
+                sum += product;
+
+                // Estilizar la explicación
+                let colorClass = "text-slate-300";
+                if (valK < 0) colorClass = "text-cyber-red"; // Negativos
+                if (valK > 0) colorClass = "text-cyber-green"; // Positivos
+
+                logHTML += `(<span class="text-white">${valI}</span> · <span class="${colorClass}">${valK}</span>)`;
+                
+                if (i < 8) logHTML += " + ";
+            }
+            
+            logHTML += ` <span class='text-slate-500'>]</span> = <span class="text-cyber-cyan font-bold text-lg">${sum}</span>`;
+
+            // 3. Actualizar DOM
+            const outputElement = document.getElementById('outputValue');
+            const resultBox = document.getElementById('resultBox');
+            const resultLabel = document.getElementById('resultLabel');
+
+            // Animación numérica
+            animateValue(outputElement, parseInt(outputElement.innerText), sum, 500);
+            
+            // Actualizar explicación
+            document.getElementById('calculationLog').innerHTML = logHTML;
+
+            // 4. Lógica de Interpretación (Color del resultado)
+            // Si el valor es muy alto (positivo o negativo), es un borde fuerte
+            const absSum = Math.abs(sum);
+            if (absSum > 200) {
+                resultBox.style.borderColor = "#00f0ff"; // Cyan fuerte
+                resultBox.style.boxShadow = "0 0 40px rgba(0, 240, 255, 0.4)";
+                resultLabel.innerText = "DETECTADO: BORDE FUERTE";
+                resultLabel.className = "mt-4 text-xs font-bold uppercase tracking-widest text-cyber-cyan animate-pulse";
+            } else if (absSum > 50) {
+                resultBox.style.borderColor = "#ffffff";
+                resultBox.style.boxShadow = "none";
+                resultLabel.innerText = "DETECTADO: RUIDO LEVE";
+                resultLabel.className = "mt-4 text-xs font-bold uppercase tracking-widest text-slate-400";
+            } else {
+                resultBox.style.borderColor = "#334155"; // Apagado
+                resultBox.style.boxShadow = "none";
+                resultLabel.innerText = "ZONA PLANA (SIN INFORMACIÓN)";
+                resultLabel.className = "mt-4 text-xs font-bold uppercase tracking-widest text-slate-600";
+            }
+        }
+
+        // Función auxiliar para animar números
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = end;
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Inicializar al cargar
+        window.onload = calculateConv;
+    </script>
+
+</body>
+</html>
+
+        </textarea>
+
+    <textarea id="codigo-slide-1" class="codigo-fuente">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 3: Laboratorio Visual Ultimate | Prometheus Logic</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300;500;700&family=Roboto:wght@100;300;700&display=swap" rel="stylesheet">
+    
+    <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+      svg: { fontCache: 'global' }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        cyber: {
+                            dark: '#050505', card: '#0f172a', cyan: '#00f0ff', purple: '#bd00ff', green: '#00ff94', red: '#ff0055'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #020202; color: #e2e8f0; }
+        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .neon-input { background: rgba(0,0,0,0.5); border: 1px solid #334155; color: #00f0ff; text-align: center; font-family: 'JetBrains Mono'; transition: 0.3s; }
+        .neon-input:focus { border-color: #00f0ff; box-shadow: 0 0 10px rgba(0,240,255,0.3); outline: none; }
+        canvas { image-rendering: pixelated; } /* Estilo retro-tech */
+    </style>
+</head>
+<body class="antialiased selection:bg-cyber-cyan selection:text-black">
+
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur border-b border-white/5 px-6 py-4 flex justify-between items-center">
+        <span class="text-xl font-bold uppercase text-white">Prometheus <span class="text-cyber-green">Logic</span></span>
+        <div class="text-[10px] uppercase border border-cyber-green/30 text-cyber-green px-3 py-1 rounded bg-cyber-green/5">
+            Laboratorio visual
+        </div>
+    </nav>
+
+    <header class="py-16 text-center px-4 relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-cyber-green/10 rounded-full blur-[100px] -z-10"></div>
+        <h1 class="text-4xl md:text-6xl font-bold mb-4 text-white">El "Microscopio" de la IA</h1>
+        <p class="text-slate-400 max-w-2xl mx-auto">Selecciona una imagen, aplica un Kernel matemático y observa cómo la computadora extrae patrones invisibles.</p>
+    </header>
+
+    <section class="max-w-7xl mx-auto px-4 pb-20">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="glass-panel p-6 rounded-xl">
+                <label class="text-xs font-bold text-cyber-green uppercase tracking-widest mb-3 block">1. Sujeto de Prueba (Input)</label>
+                <div class="flex gap-2">
+                    <button onclick="loadImage('cat')" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 p-3 rounded text-sm transition text-white">🐱 Gato</button>
+                    <button onclick="loadImage('shirt')" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 p-3 rounded text-sm transition text-white">👕 Camiseta</button>
+                    <button onclick="loadImage('brick')" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 p-3 rounded text-sm transition text-white">🧱 Ladrillos</button>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-xl">
+                <label class="text-xs font-bold text-cyber-purple uppercase tracking-widest mb-3 block">2. Filtro Matemático (Kernel)</label>
+                <select id="kernelSelect" onchange="loadPresetKernel()" class="w-full bg-black border border-white/20 text-white p-3 rounded text-sm focus:border-cyber-purple outline-none">
+                    <option value="sobel">Detección de Bordes (Sobel)</option>
+                    <option value="sharpen">Enfoque (Sharpen)</option>
+                    <option value="blur">Desenfoque (Box Blur)</option>
+                    <option value="edge_hard">Bordes Agresivos (Outline)</option>
+                    <option value="emboss">Repujado (Emboss)</option>
+                    <option value="identity">Identidad (Sin cambios)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-4 glass-panel p-6 rounded-xl h-fit border-t-2 border-t-cyber-purple">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-white font-bold uppercase tracking-wider text-sm">Matriz del Kernel ($K$)</h3>
+                    <span class="text-[10px] text-slate-500">Edita los valores para ver cambios</span>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3 max-w-[240px] mx-auto mb-8" id="kernelGrid">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="8" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                    <input type="number" class="neon-input h-14 rounded text-xl font-bold" value="-1" oninput="applyKernelToCanvas()">
+                </div>
+
+                <div class="bg-black/50 p-4 rounded text-xs text-slate-400 font-mono leading-relaxed border border-white/5">
+                    <p class="mb-2"><strong class="text-cyber-purple">¿Qué está pasando?</strong></p>
+                    <p id="kernelDescription">
+                        Este filtro compara cada píxel con sus vecinos. Si hay mucha diferencia (un borde), el resultado es alto. Si son iguales, se anula.
+                    </p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 glass-panel p-6 rounded-xl border-t-2 border-t-cyber-green relative">
+                
+                <div class="grid grid-cols-2 gap-4 h-full">
+                    <div class="text-center">
+                        <span class="text-[10px] uppercase tracking-widest text-slate-500 mb-2 block">Imagen Original</span>
+                        <div class="relative group">
+                            <img id="sourceImage" src="" class="w-full rounded border border-white/10 hidden" crossorigin="anonymous">
+                            <canvas id="canvasOriginal" class="w-full rounded border border-white/10 bg-black"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <span class="text-[10px] uppercase tracking-widest text-cyber-green mb-2 block">Visión de la Máquina (Feature Map)</span>
+                        <div class="relative">
+                            <canvas id="canvasOutput" class="w-full rounded border border-cyber-green/30 bg-black shadow-[0_0_30px_rgba(0,255,148,0.1)]"></canvas>
+                            
+                            <div id="processingLabel" class="absolute top-2 right-2 bg-black/80 text-cyber-green text-[10px] px-2 py-1 rounded hidden">
+                                PROCESANDO...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-between items-end">
+                    <div class="text-xs text-slate-500 font-mono">
+                        Resolución de Análisis: <span class="text-white">300x300 px</span><br>
+                        Operaciones por segundo: <span class="text-white">~90,000 mul/add</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // 1. Data de Imágenes en Base64 (Para evitar problemas de CORS/Archivos externos)
+        const images = {
+            cat: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExMWFhUXGB8aGBgYGBsaHRsfIB0YHxkYGCAYHSggGBolHRgdITEhJSkrLi4uGh8zODMtNygtLisBCgoKDg0OGxAQGy0lICUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAMIBAwMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAADBAIFBgABB//EAD4QAAIBAwMCBAQDBgUEAgMBAAECEQADIQQSMSJBBTKUYRMUcYFCkaEGI7HB0fAzUmLh8QcVgvEkQ1Nykv/EABoBAAMBAQEBAAAAAAAAAAAAAAECAwQABQb/xAAuEQACAgICAgEDAwMFAQAAAAAAAQIRAyESMQRBEyJRYQVxgRQykaGx8MHR4fH/2gAMAwEAAhEDEQA/APi1SpUq6IwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXHCpUqVccKlSpVxwqVKlXcc//2Q==", // Placeholder (En producción usar una real)
+            // Usaré URLs públicas confiables para el demo (Placeholders)
+            // Nota: En un entorno real, usa imágenes locales o Base64 completo.
+            // Para este ejemplo, usaré un Canvas generado dinámicamente para evitar CORS.
+        };
+
+        const canvasOriginal = document.getElementById('canvasOriginal');
+        const ctxOriginal = canvasOriginal.getContext('2d', { willReadFrequently: true });
+        const canvasOutput = document.getElementById('canvasOutput');
+        const ctxOutput = canvasOutput.getContext('2d');
+
+        // Configuración de Kernels
+        const kernels = {
+            sobel: [-1, 0, 1, -2, 0, 2, -1, 0, 1],
+            sharpen: [0, -1, 0, -1, 5, -1, 0, -1, 0],
+            blur: [1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9],
+            edge_hard: [-1, -1, -1, -1, 8, -1, -1, -1, -1],
+            emboss: [-2, -1, 0, -1, 1, 1, 0, 1, 2],
+            identity: [0, 0, 0, 0, 1, 0, 0, 0, 0]
+        };
+
+        const descriptions = {
+            sobel: "Detecta cambios bruscos de intensidad horizontalmente (bordes verticales).",
+            sharpen: "Aumenta el contraste entre píxeles adyacentes para 'enfocar' la imagen.",
+            blur: "Promedia los píxeles vecinos, suavizando el ruido y los detalles.",
+            edge_hard: "Versión agresiva que resalta cualquier cambio en todas las direcciones.",
+            emboss: "Crea un efecto de relieve 3D usando diferencias direccionales de luz.",
+            identity: "El píxel central se multiplica por 1 y el resto por 0. La imagen no cambia."
+        };
+
+        // Estado
+        let currentImageType = 'cat';
+
+        // Inicialización
+        window.onload = () => {
+            generateSyntheticImage('cat'); // Generamos imagen inicial
+            loadPresetKernel();
+        };
+
+        // 1. GENERADOR DE IMÁGENES SINTÉTICAS (Para evitar CORS y Base64 gigantes)
+        function generateSyntheticImage(type) {
+            currentImageType = type;
+            const w = 300, h = 300;
+            canvasOriginal.width = w; canvasOriginal.height = h;
+            canvasOutput.width = w; canvasOutput.height = h;
+
+            // Limpiar
+            ctxOriginal.fillStyle = "#1e1e1e";
+            ctxOriginal.fillRect(0, 0, w, h);
+
+            if (type === 'cat') {
+                // Dibujar un "Gato" abstracto (Formas con bordes claros)
+                ctxOriginal.fillStyle = "#e2e8f0"; // Cuerpo
+                ctxOriginal.beginPath(); ctxOriginal.arc(150, 180, 60, 0, Math.PI * 2); ctxOriginal.fill();
+                ctxOriginal.beginPath(); ctxOriginal.arc(150, 100, 40, 0, Math.PI * 2); ctxOriginal.fill(); // Cabeza
+                // Orejas (Triangulos = Bordes fuertes)
+                ctxOriginal.beginPath(); ctxOriginal.moveTo(120, 70); ctxOriginal.lineTo(110, 30); ctxOriginal.lineTo(140, 60); ctxOriginal.fill();
+                ctxOriginal.beginPath(); ctxOriginal.moveTo(180, 70); ctxOriginal.lineTo(190, 30); ctxOriginal.lineTo(160, 60); ctxOriginal.fill();
+                // Ojos
+                ctxOriginal.fillStyle = "#000"; 
+                ctxOriginal.beginPath(); ctxOriginal.arc(135, 95, 5, 0, Math.PI*2); ctxOriginal.fill();
+                ctxOriginal.beginPath(); ctxOriginal.arc(165, 95, 5, 0, Math.PI*2); ctxOriginal.fill();
+                // Bigotes (Lineas finas)
+                ctxOriginal.strokeStyle = "#fff"; ctxOriginal.lineWidth = 2;
+                ctxOriginal.beginPath(); ctxOriginal.moveTo(150, 110); ctxOriginal.lineTo(100, 100); ctxOriginal.stroke();
+                ctxOriginal.beginPath(); ctxOriginal.moveTo(150, 110); ctxOriginal.lineTo(200, 100); ctxOriginal.stroke();
+
+            } else if (type === 'shirt') {
+                // Dibujar textura de camiseta (Ruido + Patrón)
+                ctxOriginal.fillStyle = "#3b82f6";
+                ctxOriginal.fillRect(80, 50, 140, 200); // Base
+                // Cuello
+                ctxOriginal.fillStyle = "#1e1e1e";
+                ctxOriginal.beginPath(); ctxOriginal.arc(150, 50, 30, 0, Math.PI, false); ctxOriginal.fill();
+                // Textura (Rayas)
+                ctxOriginal.strokeStyle = "rgba(255,255,255,0.1)"; ctxOriginal.lineWidth = 2;
+                for(let i=60; i<250; i+=10) {
+                    ctxOriginal.beginPath(); ctxOriginal.moveTo(80, i); ctxOriginal.lineTo(220, i); ctxOriginal.stroke();
+                }
+
+            } else if (type === 'brick') {
+                // Pared de ladrillos (Bordes repetitivos)
+                ctxOriginal.fillStyle = "#7f1d1d"; // Rojo oscuro
+                for(let y=0; y<300; y+=30) {
+                    let offset = (y % 60 === 0) ? 0 : 15;
+                    for(let x=-15; x<300; x+=60) {
+                        ctxOriginal.fillRect(x + offset + 2, y + 2, 56, 26);
+                    }
+                }
+            }
+
+            applyKernelToCanvas();
+        }
+
+        function loadImage(type) {
+            generateSyntheticImage(type);
+        }
+
+        // 2. CARGAR PRESETS DE KERNEL
+        function loadPresetKernel() {
+            const select = document.getElementById('kernelSelect');
+            const kernelName = select.value;
+            const values = kernels[kernelName];
+            const inputs = document.querySelectorAll('#kernelGrid input');
+
+            // Actualizar descripción
+            document.getElementById('kernelDescription').innerText = descriptions[kernelName];
+
+            // Rellenar inputs
+            inputs.forEach((input, index) => {
+                input.value = values[index];
+                // Efecto visual si cambia drásticamente
+                input.classList.add('bg-cyber-purple/20');
+                setTimeout(() => input.classList.remove('bg-cyber-purple/20'), 300);
+            });
+
+            applyKernelToCanvas();
+        }
+
+        // 3. MOTOR DE CONVOLUCIÓN (Aquí ocurre la magia)
+        function applyKernelToCanvas() {
+            // Obtener valores actuales del Grid
+            const inputs = document.querySelectorAll('#kernelGrid input');
+            const kernel = Array.from(inputs).map(i => parseFloat(i.value));
+
+            // Obtener data de la imagen
+            const w = canvasOriginal.width;
+            const h = canvasOriginal.height;
+            if (w === 0) return;
+
+            const imgDataSrc = ctxOriginal.getImageData(0, 0, w, h);
+            const dataSrc = imgDataSrc.data;
+            const imgDataDst = ctxOutput.createImageData(w, h);
+            const dataDst = imgDataDst.data;
+
+            // Función auxiliar para obtener índice
+            const idx = (x, y) => (y * w + x) * 4;
+
+            // Recorrer píxeles (ignorar bordes para simplificar)
+            for (let y = 1; y < h - 1; y++) {
+                for (let x = 1; x < w - 1; x++) {
+                    let r = 0, g = 0, b = 0;
+
+                    // Aplicar Kernel 3x3
+                    let kIndex = 0;
+                    for (let ky = -1; ky <= 1; ky++) {
+                        for (let kx = -1; kx <= 1; kx++) {
+                            const pixelPos = idx(x + kx, y + ky);
+                            const weight = kernel[kIndex];
+                            
+                            r += dataSrc[pixelPos] * weight;
+                            g += dataSrc[pixelPos + 1] * weight;
+                            b += dataSrc[pixelPos + 2] * weight;
+                            kIndex++;
+                        }
+                    }
+
+                    // Asignar al destino (Clamp entre 0 y 255)
+                    const pos = idx(x, y);
+                    dataDst[pos] = Math.min(Math.max(r, 0), 255);
+                    dataDst[pos + 1] = Math.min(Math.max(g, 0), 255);
+                    dataDst[pos + 2] = Math.min(Math.max(b, 0), 255);
+                    dataDst[pos + 3] = 255; // Alpha
+                }
+            }
+
+            ctxOutput.putImageData(imgDataDst, 0, 0);
+        }
+
+    </script>
+</body>
+</html>
+
+
+
+        </textarea>
+
+    <textarea id="codigo-slide-2" class="codigo-fuente">
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 4: Pipeline de Decisión | Prometheus Logic</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300;500;700&family=Roboto:wght@100;300;700&display=swap" rel="stylesheet">
+    
+    <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+      svg: { fontCache: 'global' }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        cyber: {
+                            dark: '#020202', card: '#0f172a', cyan: '#00f0ff', purple: '#bd00ff', green: '#00ff94', red: '#ff0055', yellow: '#facc15'
+                        }
+                    },
+                    animation: {
+                        'flow': 'flowAnimation 2s linear infinite',
+                    },
+                    keyframes: {
+                        flowAnimation: {
+                            '0%': { strokeDashoffset: '24' },
+                            '100%': { strokeDashoffset: '0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #020202; color: #e2e8f0; }
+        .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        
+        /* Scanline Effect */
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #00f0ff;
+            box-shadow: 0 0 15px #00f0ff;
+            z-index: 10;
+            top: 0;
+            left: 0;
+            transition: top 0.05s linear;
+        }
+        
+        .progress-bar { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyber-purple selection:text-white">
+
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur border-b border-white/5 px-6 py-4 flex justify-between items-center">
+        <span class="text-xl font-bold uppercase text-white">Prometheus <span class="text-cyber-purple">Logic</span></span>
+        <div class="flex gap-4 items-center">
+            
+            <div class="text-[10px] uppercase border border-cyber-purple/30 text-cyber-purple px-3 py-1 rounded bg-cyber-purple/5">
+                laboratorio visual
+            </div>
+        </div>
+    </nav>
+
+    <header class="py-16 text-center px-4 relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-cyber-purple/10 rounded-full blur-[120px] -z-10"></div>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 text-white">Del Píxel a la <span class="text-cyber-cyan">Decisión</span></h1>
+        <p class="text-slate-400 max-w-3xl mx-auto text-lg font-light">
+            Entendiendo la diferencia crítica: <br>
+            <span class="text-cyber-green font-bold">Clasificación</span> (¿Qué es?) vs <span class="text-cyber-purple font-bold">Segmentación</span> (¿Dónde está exactamente?).
+        </p>
+    </header>
+
+    <section class="max-w-7xl mx-auto px-4 mb-20">
+        <div class="glass-panel p-8 rounded-2xl border-t border-white/10">
+            <h2 class="text-xl font-bold text-white uppercase tracking-widest mb-8 border-l-4 border-cyber-cyan pl-4">Arquitectura End-to-End</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center text-center">
+                
+                <div class="relative group">
+                    <div class="w-16 h-16 mx-auto bg-slate-800 rounded border border-white/20 flex items-center justify-center text-2xl">📷</div>
+                    <p class="text-xs font-bold text-cyber-cyan mt-2 uppercase">Input</p>
+                    <p class="text-[10px] text-slate-500">Raw Tensor ($H \times W \times C$)</p>
+                </div>
+
+                <div class="hidden md:flex justify-center">
+                    <svg class="w-20 h-6 text-slate-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+
+                <div class="relative group">
+                    <div class="w-16 h-16 mx-auto bg-slate-900 rounded border border-cyber-green/50 flex flex-col items-center justify-center gap-1 shadow-[0_0_15px_rgba(0,255,148,0.2)]">
+                        <div class="w-10 h-1 bg-cyber-green/50 rounded"></div>
+                        <div class="w-8 h-1 bg-cyber-green/50 rounded"></div>
+                        <div class="w-6 h-1 bg-cyber-green/50 rounded"></div>
+                    </div>
+                    <p class="text-xs font-bold text-cyber-green mt-2 uppercase">Backbone</p>
+                    <p class="text-[10px] text-slate-500">Feature Extraction (Conv2D)</p>
+                </div>
+
+                <div class="hidden md:flex justify-center">
+                    <svg class="w-20 h-6 text-slate-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+
+                <div class="relative group">
+                    <div class="w-16 h-16 mx-auto bg-slate-900 rounded border border-cyber-purple/50 flex items-center justify-center text-cyber-purple font-mono font-bold text-lg shadow-[0_0_15px_rgba(189,0,255,0.2)]">
+                        FC
+                    </div>
+                    <p class="text-xs font-bold text-cyber-purple mt-2 uppercase">Head</p>
+                    <p class="text-[10px] text-slate-500">Softmax / Sigmoid Mask</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-4 pb-20">
+        
+        <div class="flex flex-col md:flex-row gap-6 mb-8 items-center justify-between">
+            <div>
+                <h2 class="text-3xl font-bold text-white mb-2">Simulación de Inferencia</h2>
+                <p class="text-slate-400 text-sm">Selecciona un caso de uso y activa el escáner para ver cómo la red segmenta y clasifica simultáneamente.</p>
+            </div>
+            
+            <div class="flex gap-2 bg-black/50 p-2 rounded-lg border border-white/10">
+                <button onclick="setScenario('industrial')" class="px-4 py-2 text-xs font-bold uppercase rounded bg-cyber-green/10 text-cyber-green border border-cyber-green/30 hover:bg-cyber-green hover:text-black transition">🏭 Industrial</button>
+                <button onclick="setScenario('medical')" class="px-4 py-2 text-xs font-bold uppercase rounded bg-cyber-purple/10 text-cyber-purple border border-cyber-purple/30 hover:bg-cyber-purple hover:text-black transition">🩻 Médico</button>
+                <button onclick="setScenario('satellite')" class="px-4 py-2 text-xs font-bold uppercase rounded bg-cyber-cyan/10 text-cyber-cyan border border-cyber-cyan/30 hover:bg-cyber-cyan hover:text-black transition">🛰️ Satelital</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-7 glass-panel p-1 rounded-xl relative overflow-hidden group">
+                <div class="relative h-[400px] w-full bg-black rounded-lg overflow-hidden border border-white/10" id="viewport">
+                    
+                    <canvas id="canvasBase" class="absolute top-0 left-0 w-full h-full object-cover"></canvas>
+                    
+                    <canvas id="canvasMask" class="absolute top-0 left-0 w-full h-full object-cover mix-blend-screen opacity-80"></canvas>
+                    
+                    <div id="scanLine" class="scan-line hidden"></div>
+
+                    <div class="absolute top-4 left-4 flex flex-col gap-1">
+                        <span class="bg-black/80 text-white text-[10px] px-2 py-1 rounded font-mono border border-white/10">FPS: 60</span>
+                        <span class="bg-black/80 text-cyber-cyan text-[10px] px-2 py-1 rounded font-mono border border-cyber-cyan/30">MODE: SEMANTIC SEGMENTATION</span>
+                    </div>
+
+                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2">
+                        <button onclick="runScan()" id="scanBtn" class="bg-white text-black font-bold uppercase tracking-widest text-xs px-8 py-3 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.4)] hover:scale-105 transition hover:shadow-[0_0_30px_rgba(0,240,255,0.6)]">
+                            ▶ Iniciar Análisis
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-l-cyber-green">
+                    <h3 class="text-white font-bold uppercase tracking-wider text-sm mb-4 flex justify-between">
+                        1. Clasificación (Global)
+                        <span class="text-[10px] text-slate-500 font-mono self-center">Softmax Output</span>
+                    </h3>
+                    
+                    <div id="classBars" class="space-y-4">
+                        </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-l-cyber-purple">
+                    <h3 class="text-white font-bold uppercase tracking-wider text-sm mb-4 flex justify-between">
+                        2. Segmentación (Local)
+                        <span class="text-[10px] text-slate-500 font-mono self-center">Pixel-wise Binary Mask</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-black/40 p-3 rounded border border-white/5">
+                            <span class="text-[10px] text-slate-400 uppercase block mb-1">Área Detectada</span>
+                            <span id="segArea" class="text-xl font-mono text-cyber-purple">0 px</span>
+                        </div>
+                        <div class="bg-black/40 p-3 rounded border border-white/5">
+                            <span class="text-[10px] text-slate-400 uppercase block mb-1">Confianza Media</span>
+                            <span id="segConf" class="text-xl font-mono text-white">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-xs text-slate-500 font-mono bg-black/20 p-2 rounded">
+                        Mask Shape: $(1, H, W)$ <br>
+                        Threshold: $> 0.5$
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="bg-black py-10 border-t border-white/10 mt-10">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <p class="text-xs font-mono text-slate-600 mb-4 uppercase tracking-widest">// Funciones de Activación Utilizadas //</p>
+            <div class="flex justify-center gap-12 text-slate-400 text-sm">
+                <div>
+                    <span class="text-cyber-green font-bold block mb-2">Clasificación</span>
+                    $$ \sigma(z)_i = \frac{e^{z_i}}{\sum_{j} e^{z_j}} $$
+                </div>
+                <div>
+                    <span class="text-cyber-purple font-bold block mb-2">Segmentación</span>
+                    $$ S(x) = \frac{1}{1 + e^{-x}} $$
+                </div>
+            </div>
+            <p class="text-[10px] text-slate-700 mt-8">PROMETHEUS LOGIC</p>
+            <p class="text-slate-600 text-sm">Laboratorio de Inteligencia Artificial</p>
+        </div>
+    </footer>
+
+    <script>
+        const canvasBase = document.getElementById('canvasBase');
+        const ctxBase = canvasBase.getContext('2d');
+        const canvasMask = document.getElementById('canvasMask');
+        const ctxMask = canvasMask.getContext('2d');
+        
+        let currentScenario = 'industrial';
+        let isScanning = false;
+
+        // Configuración de los Escenarios
+        const scenarios = {
+            industrial: {
+                classes: [
+                    { name: 'Engranaje OK', color: 'bg-slate-600', val: 5 },
+                    { name: 'Fisura (Defecto)', color: 'bg-cyber-red', val: 95 },
+                    { name: 'Mancha Aceite', color: 'bg-cyber-yellow', val: 15 }
+                ],
+                drawBase: (ctx, w, h) => {
+                    ctx.fillStyle = '#1e293b'; ctx.fillRect(0,0,w,h);
+                    // Engranaje
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.beginPath(); ctx.arc(w/2, h/2, 80, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(w/2, h/2, 20, 0, Math.PI*2); ctx.fill();
+                    // Dientes
+                    for(let i=0; i<360; i+=45){
+                        ctx.fillStyle = '#94a3b8';
+                        let rad = i * Math.PI/180;
+                        ctx.fillRect(w/2 + Math.cos(rad)*80 -10, h/2 + Math.sin(rad)*80 -10, 20, 30);
+                    }
+                    // Fisura (Crack)
+                    ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.moveTo(w/2 + 40, h/2 - 10); ctx.lineTo(w/2 + 70, h/2 + 20); ctx.stroke();
+                },
+                drawMask: (ctx, w, h) => {
+                    // Mascara sobre la fisura
+                    ctx.strokeStyle = '#ff0055'; ctx.lineWidth = 8; ctx.lineCap = 'round';
+                    ctx.beginPath(); ctx.moveTo(w/2 + 40, h/2 - 10); ctx.lineTo(w/2 + 70, h/2 + 20); ctx.stroke();
+                    // Glow
+                    ctx.shadowColor = '#ff0055'; ctx.shadowBlur = 20; ctx.stroke(); ctx.shadowBlur = 0;
+                },
+                area: "145 px²", conf: "98.4%"
+            },
+            medical: {
+                classes: [
+                    { name: 'Tejido Sano', color: 'bg-slate-600', val: 10 },
+                    { name: 'Neumonía', color: 'bg-cyber-cyan', val: 88 },
+                    { name: 'Tumor', color: 'bg-cyber-purple', val: 5 }
+                ],
+                drawBase: (ctx, w, h) => {
+                    ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
+                    // Pulmones
+                    ctx.fillStyle = '#333'; 
+                    ctx.beginPath(); ctx.ellipse(w/3, h/2, 50, 100, 0, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.ellipse(w*2/3, h/2, 50, 100, 0, 0, Math.PI*2); ctx.fill();
+                    // Costillas
+                    ctx.strokeStyle = '#555'; ctx.lineWidth = 5;
+                    for(let y=100; y<300; y+=30) {
+                        ctx.beginPath(); ctx.moveTo(50, y); ctx.quadraticCurveTo(w/2, y-20, w-50, y); ctx.stroke();
+                    }
+                    // Infección
+                    ctx.fillStyle = '#666'; ctx.globalAlpha = 0.5;
+                    ctx.beginPath(); ctx.arc(w*2/3 - 10, h/2 + 20, 30, 0, Math.PI*2); ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                },
+                drawMask: (ctx, w, h) => {
+                    ctx.fillStyle = 'rgba(6, 182, 212, 0.6)'; // Cyan transparente
+                    ctx.beginPath(); ctx.arc(w*2/3 - 10, h/2 + 20, 30, 0, Math.PI*2); ctx.fill();
+                    ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 2; ctx.stroke();
+                },
+                area: "2,340 px²", conf: "89.1%"
+            },
+            satellite: {
+                classes: [
+                    { name: 'Bosque', color: 'bg-cyber-green', val: 20 },
+                    { name: 'Agua', color: 'bg-cyber-cyan', val: 10 },
+                    { name: 'Carretera', color: 'bg-cyber-purple', val: 92 }
+                ],
+                drawBase: (ctx, w, h) => {
+                    ctx.fillStyle = '#064e3b'; ctx.fillRect(0,0,w,h); // Bosque
+                    // Rio
+                    ctx.fillStyle = '#1e3a8a'; 
+                    ctx.beginPath(); ctx.moveTo(0, h-50); ctx.bezierCurveTo(w/3, h-100, w*2/3, h, w, h-80); ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.fill();
+                    // Carretera
+                    ctx.strokeStyle = '#64748b'; ctx.lineWidth = 20;
+                    ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(w-50, h); ctx.stroke();
+                    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.setLineDash([10, 10]);
+                    ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(w-50, h); ctx.stroke(); ctx.setLineDash([]);
+                },
+                drawMask: (ctx, w, h) => {
+                    ctx.strokeStyle = 'rgba(189, 0, 255, 0.7)'; ctx.lineWidth = 20;
+                    ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(w-50, h); ctx.stroke();
+                },
+                area: "15.2 km²", conf: "94.5%"
+            }
+        };
+
+        function setScenario(type) {
+            currentScenario = type;
+            initCanvas();
+            resetUI();
+        }
+
+        function initCanvas() {
+            // Ajustar tamaño
+            const container = document.getElementById('viewport');
+            const w = container.offsetWidth;
+            const h = container.offsetHeight;
+            
+            canvasBase.width = w; canvasBase.height = h;
+            canvasMask.width = w; canvasMask.height = h;
+
+            // Dibujar Base
+            scenarios[currentScenario].drawBase(ctxBase, w, h);
+            
+            // Dibujar Máscara (pero borrarla inicialmente usando clearRect o similar, 
+            // aunque aquí la dibujaremos y la ocultaremos con CSS clip-path en la animación)
+            ctxMask.clearRect(0,0,w,h);
+            scenarios[currentScenario].drawMask(ctxMask, w, h);
+            
+            // Inicialmente ocultar la máscara completa
+            canvasMask.style.clipPath = 'polygon(0 0, 100% 0, 100% 0, 0 0)';
+        }
+
+        function resetUI() {
+            document.getElementById('segArea').innerText = "0 px";
+            document.getElementById('segConf').innerText = "0%";
+            
+            const barsContainer = document.getElementById('classBars');
+            barsContainer.innerHTML = '';
+            
+            scenarios[currentScenario].classes.forEach(c => {
+                const bar = `
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-300 font-bold">${c.name}</span>
+                            <span class="text-cyber-cyan font-mono prob-text" data-target="${c.val}">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div class="progress-bar ${c.color} h-full rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                `;
+                barsContainer.innerHTML += bar;
+            });
+        }
+
+        function runScan() {
+            if (isScanning) return;
+            isScanning = true;
+            
+            const line = document.getElementById('scanLine');
+            const btn = document.getElementById('scanBtn');
+            const mask = document.getElementById('canvasMask');
+            const height = document.getElementById('viewport').offsetHeight;
+            
+            line.classList.remove('hidden');
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            let pos = 0;
+            const speed = 4; // pixeles por frame
+
+            function step() {
+                pos += speed;
+                
+                // Mover línea
+                line.style.top = pos + 'px';
+                
+                // Revelar máscara progresivamente
+                let percentage = (pos / height) * 100;
+                mask.style.clipPath = `polygon(0 0, 100% 0, 100% ${percentage}%, 0 ${percentage}%)`;
+
+                // Actualizar barras de probabilidad gradualmente
+                updateProbabilities(percentage);
+
+                if (pos < height) {
+                    requestAnimationFrame(step);
+                } else {
+                    // Finalizar
+                    isScanning = false;
+                    line.classList.add('hidden');
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    
+                    // Mostrar datos finales
+                    document.getElementById('segArea').innerText = scenarios[currentScenario].area;
+                    document.getElementById('segConf').innerText = scenarios[currentScenario].conf;
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        function updateProbabilities(percentage) {
+            // Simular que la certeza aumenta a medida que el escáner baja
+            const bars = document.querySelectorAll('.progress-bar');
+            const texts = document.querySelectorAll('.prob-text');
+            
+            bars.forEach((bar, idx) => {
+                const targetVal = scenarios[currentScenario].classes[idx].val;
+                // La probabilidad actual es proporcional al % del escaneo
+                const currentVal = (targetVal * (percentage / 100)).toFixed(1);
+                
+                bar.style.width = currentVal + '%';
+                texts[idx].innerText = Math.floor(currentVal) + '%';
+            });
+        }
+
+        // Init
+        window.onload = () => {
+            initCanvas();
+            resetUI();
+            window.addEventListener('resize', initCanvas);
+        };
+    </script>
+</body>
+</html>
+
+
+
+        
+        </textarea>
+
+    <textarea id="codigo-slide-3" class="codigo-fuente">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 5: Redes Neuronales (MNIST) | Prometheus Logic</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=JetBrains+Mono:wght@300;500;700&family=Roboto:wght@100;300;700&display=swap" rel="stylesheet">
+    
+    <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+      svg: { fontCache: 'global' }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        cyber: {
+                            dark: '#020202', card: '#0f172a', cyan: '#00f0ff', purple: '#bd00ff', green: '#00ff94', red: '#ff0055'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #020202; color: #e2e8f0; }
+        .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        
+        canvas { 
+            cursor: crosshair; 
+            image-rendering: pixelated;
+        }
+        
+        .neuron {
+            width: 12px; height: 12px;
+            background: #1e293b;
+            border-radius: 50%;
+            border: 1px solid #334155;
+            transition: all 0.1s;
+        }
+        .neuron.active {
+            background: #00f0ff;
+            box-shadow: 0 0 10px #00f0ff;
+            border-color: #fff;
+        }
+
+        .synapse-line {
+            stroke: #334155;
+            stroke-width: 1;
+            opacity: 0.2;
+            transition: all 0.1s;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyber-cyan selection:text-black">
+
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur border-b border-white/5 px-6 py-4 flex justify-between items-center">
+        <span class="text-xl font-bold uppercase text-white">Prometheus <span class="text-cyber-cyan">Logic</span></span>
+        <div class="flex gap-4 items-center">
+            
+            <div class="text-[10px] uppercase border border-cyber-cyan/30 text-cyber-cyan px-3 py-1 rounded bg-cyber-cyan/5">
+                laboratorio visual
+            </div>
+        </div>
+    </nav>
+
+    <header class="py-12 text-center px-4 relative">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">El Cerebro Digital</h1>
+        <p class="text-slate-400 max-w-2xl mx-auto">
+            Dibuja un número del 0 al 9. La Red Neuronal convertirá tus trazos en probabilidades matemáticas.
+        </p>
+    </header>
+
+    <section class="max-w-7xl mx-auto px-4 pb-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <div class="lg:col-span-4 flex flex-col gap-4">
+                <div class="glass-panel p-6 rounded-xl border-t border-cyber-cyan">
+                    <div class="flex justify-between mb-4">
+                        <h3 class="text-white font-bold uppercase tracking-widest text-sm">Input Layer</h3>
+                        <span class="text-[10px] text-slate-500 font-mono">28x28 Grid (784 Inputs)</span>
+                    </div>
+                    
+                    <div class="relative mx-auto w-fit group">
+                        <canvas id="drawCanvas" width="280" height="280" class="bg-black border border-white/20 rounded shadow-[0_0_30px_rgba(0,0,0,0.5)]"></canvas>
+                        
+                        <div class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20" 
+                             style="background-image: linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px); background-size: 10px 10px;">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mt-6">
+                        <button onclick="clearCanvas()" class="text-xs uppercase font-bold text-slate-400 hover:text-white border border-white/10 hover:bg-white/5 px-4 py-2 rounded transition">
+                            Borrar (Clear)
+                        </button>
+                        <span class="text-[10px] text-cyber-cyan self-center animate-pulse hidden" id="predictingLabel">PROCESANDO TENSOR...</span>
+                    </div>
+                </div>
+
+                <div class="bg-black/50 p-4 rounded border border-white/10 text-xs font-mono text-slate-400">
+                    <p class="mb-2"><strong class="text-white">Proceso de Inferencia:</strong></p>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Imagen 2D $\to$ Vector 1D ($x$)</li>
+                        <li>Producto Punto: $z = W \cdot x + b$</li>
+                        <li>Activación: $y = \text{softmax}(z)$</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 glass-panel p-6 rounded-xl flex flex-col items-center justify-center relative min-h-[400px]">
+                <svg id="networkSvg" class="absolute top-0 left-0 w-full h-full pointer-events-none z-0"></svg>
+                
+                <div class="flex justify-between w-full h-full z-10 px-8">
+                    <div class="flex flex-col justify-center gap-1" id="inputNeurons">
+                        </div>
+
+                    <div class="flex flex-col justify-center gap-3" id="outputNeurons">
+                        </div>
+                </div>
+
+                <div class="absolute bottom-4 text-[10px] uppercase tracking-[4px] text-slate-600">
+                    Fully Connected Layer
+                </div>
+            </div>
+
+            <div class="lg:col-span-3">
+                <div class="glass-panel p-6 rounded-xl border-t border-cyber-purple h-full">
+                    <h3 class="text-white font-bold uppercase tracking-widest text-sm mb-6">Predicción (Softmax)</h3>
+                    
+                    <div class="text-center mb-8">
+                        <div id="predictionDisplay" class="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-600">
+                            -
+                        </div>
+                        <p class="text-xs text-cyber-purple uppercase tracking-widest mt-2">Dígito Detectado</p>
+                    </div>
+
+                    <div class="space-y-2" id="probabilitiesChart">
+                        </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // CONFIGURACIÓN
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        let isDrawing = false;
+        
+        // PESOS PRE-ENTRENADOS (SIMPLIFICADOS)
+        // Estos son "promedios" de los dígitos del MNIST. 
+        // Actúan como los pesos W de una capa densa simple.
+        // Formato: 10 arrays de 64 valores (8x8 grid simplificado para performance en JS puro)
+        const WEIGHTS = {
+            0: [0,0,0,1,1,0,0,0, 0,0,1,0,0,1,0,0, 0,1,0,0,0,0,1,0, 0,1,0,0,0,0,1,0, 0,1,0,0,0,0,1,0, 0,1,0,0,0,0,1,0, 0,0,1,0,0,1,0,0, 0,0,0,1,1,0,0,0],
+            1: [0,0,0,1,0,0,0,0, 0,0,1,1,0,0,0,0, 0,0,0,1,0,0,0,0, 0,0,0,1,0,0,0,0, 0,0,0,1,0,0,0,0, 0,0,0,1,0,0,0,0, 0,0,0,1,0,0,0,0, 0,0,1,1,1,0,0,0],
+            2: [0,0,1,1,1,0,0,0, 0,1,0,0,0,1,0,0, 0,0,0,0,0,1,0,0, 0,0,0,0,1,0,0,0, 0,0,0,1,0,0,0,0, 0,0,1,0,0,0,0,0, 0,1,0,0,0,0,0,0, 0,1,1,1,1,1,0,0],
+            3: [0,0,1,1,1,0,0,0, 0,1,0,0,0,1,0,0, 0,0,0,0,0,1,0,0, 0,0,1,1,1,0,0,0, 0,0,0,0,0,1,0,0, 0,0,0,0,0,1,0,0, 0,1,0,0,0,1,0,0, 0,0,1,1,1,0,0,0],
+            4: [0,0,0,0,1,0,0,0, 0,0,0,1,1,0,0,0, 0,0,1,0,1,0,0,0, 0,1,0,0,1,0,0,0, 1,1,1,1,1,1,0,0, 0,0,0,0,1,0,0,0, 0,0,0,0,1,0,0,0, 0,0,0,0,1,0,0,0],
+            5: [0,1,1,1,1,1,0,0, 0,1,0,0,0,0,0,0, 0,1,1,1,1,0,0,0, 0,0,0,0,0,1,0,0, 0,0,0,0,0,1,0,0, 0,0,0,0,0,1,0,0, 0,1,0,0,0,1,0,0, 0,0,1,1,1,0,0,0],
+            6: [0,0,0,1,1,0,0,0, 0,0,1,0,0,0,0,0, 0,1,0,0,0,0,0,0, 0,1,1,1,1,0,0,0, 0,1,0,0,0,1,0,0, 0,1,0,0,0,1,0,0, 0,1,0,0,0,1,0,0, 0,0,1,1,1,0,0,0],
+            7: [0,1,1,1,1,1,1,0, 0,0,0,0,0,1,0,0, 0,0,0,0,1,0,0,0, 0,0,0,1,0,0,0,0, 0,0,1,0,0,0,0,0, 0,0,1,0,0,0,0,0, 0,0,1,0,0,0,0,0, 0,0,1,0,0,0,0,0],
+            8: [0,0,1,1,1,0,0,0, 0,1,0,0,0,1,0,0, 0,1,0,0,0,1,0,0, 0,0,1,1,1,0,0,0, 0,1,0,0,0,1,0,0, 0,1,0,0,0,1,0,0, 0,1,0,0,0,1,0,0, 0,0,1,1,1,0,0,0],
+            9: [0,0,1,1,1,0,0,0, 0,1,0,0,0,1,0,0, 0,1,0,0,0,1,0,0, 0,0,1,1,1,1,0,0, 0,0,0,0,0,1,0,0, 0,0,0,0,0,1,0,0, 0,0,0,0,1,0,0,0, 0,0,1,1,0,0,0,0]
+        };
+
+        // SETUP INICIAL
+        function init() {
+            // Setup Canvas
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.lineWidth = 20;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = "white";
+
+            // Listeners
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mouseup', stopDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseleave', stopDraw);
+
+            // Generar Neuronas Visuales
+            setupNetworkViz();
+            resetChart();
+        }
+
+        function setupNetworkViz() {
+            const inputContainer = document.getElementById('inputNeurons');
+            const outputContainer = document.getElementById('outputNeurons');
+            
+            // Input Neurons (Visualizamos solo una muestra representativa, no las 784)
+            for(let i=0; i<15; i++) {
+                const n = document.createElement('div');
+                n.className = 'neuron input-n opacity-50';
+                inputContainer.appendChild(n);
+            }
+
+            // Output Neurons (0-9)
+            for(let i=0; i<10; i++) {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-2';
+                div.innerHTML = `
+                    <div class="neuron output-n" id="out-n-${i}"></div>
+                    <span class="text-xs font-mono text-slate-500">${i}</span>
+                `;
+                outputContainer.appendChild(div);
+            }
+        }
+
+        // LÓGICA DE DIBUJO
+        function startDraw(e) {
+            isDrawing = true;
+            draw(e);
+        }
+        function stopDraw() {
+            isDrawing = false;
+            ctx.beginPath();
+            predict(); // Predecir al soltar el mouse
+        }
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+        function clearCanvas() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('predictionDisplay').innerText = "-";
+            document.getElementById('predictionDisplay').classList.remove('text-cyber-cyan');
+            resetChart();
+            animateNetwork([], []); // Reset viz
+        }
+
+        // MOTOR DE INFERENCIA (SIMULADO PERO BASADO EN DATOS REALES)
+        function predict() {
+            document.getElementById('predictingLabel').classList.remove('hidden');
+
+            // 1. Obtener imagen y reducirla a 8x8 (64 inputs) para matchear con nuestros pesos
+            // Esto simula el proceso de Downsampling/Pooling
+            const inputVector = getSimplifiedInput();
+
+            // 2. Multiplicación de Matrices (Dot Product)
+            // Scores = Input • Weights
+            let scores = [];
+            for(let digit=0; digit<10; digit++) {
+                let sum = 0;
+                const w = WEIGHTS[digit];
+                
+                for(let i=0; i<64; i++) {
+                    sum += inputVector[i] * w[i];
+                }
+                scores.push(sum);
+            }
+
+            // 3. Softmax (Convertir scores a probabilidades)
+            // const expScores = scores.map(Math.exp); // Puede desbordar, usamos versión estable
+            const maxScore = Math.max(...scores); // Estabilidad numérica
+            const expScores = scores.map(s => Math.exp(s - maxScore));
+            const sumExp = expScores.reduce((a, b) => a + b, 0);
+            const probabilities = expScores.map(s => s / sumExp);
+
+            // 4. Resultado
+            const maxProb = Math.max(...probabilities);
+            const predictedDigit = probabilities.indexOf(maxProb);
+
+            // UI Update
+            updateUI(predictedDigit, probabilities, inputVector);
+            document.getElementById('predictingLabel').classList.add('hidden');
+        }
+
+        function getSimplifiedInput() {
+            // Creamos un canvas temporal de 8x8 para hacer el resize
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 8;
+            tempCanvas.height = 8;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Dibujamos el canvas original escalado a 8x8
+            tempCtx.drawImage(canvas, 0, 0, 8, 8);
+            
+            const imageData = tempCtx.getImageData(0, 0, 8, 8).data;
+            const vector = [];
+            
+            // Extraer solo el canal Rojo (es escala de grises, r=g=b) y normalizar 0-1
+            for(let i=0; i<imageData.length; i+=4) {
+                vector.push(imageData[i] / 255);
+            }
+            return vector;
+        }
+
+        // ACTUALIZACIÓN VISUAL
+        function updateUI(digit, probs, inputVector) {
+            // Big Number
+            const display = document.getElementById('predictionDisplay');
+            display.innerText = digit;
+            display.classList.add('text-cyber-cyan');
+
+            // Bar Chart
+            const chart = document.getElementById('probabilitiesChart');
+            chart.innerHTML = '';
+            probs.forEach((p, i) => {
+                const percent = (p * 100).toFixed(1);
+                const isWinner = i === digit;
+                const color = isWinner ? 'bg-cyber-cyan' : 'bg-slate-700';
+                const textColor = isWinner ? 'text-white font-bold' : 'text-slate-500';
+                
+                chart.innerHTML += `
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="w-4 text-right ${textColor}">${i}</span>
+                        <div class="flex-1 bg-black/50 rounded-full h-2">
+                            <div class="${color} h-full rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                        </div>
+                        <span class="w-10 ${textColor}">${percent}%</span>
+                    </div>
+                `;
+            });
+
+            // Animate Neurons
+            animateNetwork(inputVector, probs);
+        }
+
+        function animateNetwork(inputs, outputs) {
+            // Activar inputs visualmente (solo simulado porque tenemos 15 visuales vs 64 reales)
+            const inputNeurons = document.querySelectorAll('.input-n');
+            inputNeurons.forEach(n => {
+                if(Math.random() > 0.5 && inputs.some(x => x > 0.5)) n.classList.add('active');
+                else n.classList.remove('active');
+            });
+
+            // Activar outputs
+            const outputNeurons = document.querySelectorAll('.output-n');
+            outputNeurons.forEach((n, i) => {
+                if(outputs[i] > 0.1) n.classList.add('active'); // Threshold visual
+                else n.classList.remove('active');
+            });
+        }
+
+        function resetChart() {
+            const chart = document.getElementById('probabilitiesChart');
+            chart.innerHTML = '<div class="text-center text-slate-600 text-xs py-4">Esperando entrada...</div>';
+        }
+
+        // Start
+        init();
+
+    </script>
+</body>
+</html>
+
+        </textarea>
+
+    <script>
+        let slideActual = 0;
+        const totalSlides = 4;
+        const titulos = [
+            "KERNEL CONVOLUCIÓN",
+            "VISIÓN OBJETOS",
+            "PIPELINE DE DECISIÓN",
+            "REDES NEURONALES y VISÍON"
+        ];
+
+        function actualizarUI() {
+            // Actualizar Título
+            document.getElementById('titulo-slide').innerText = titulos[slideActual];
+            
+            // Actualizar Puntitos
+            document.querySelectorAll('.dot').forEach((d, i) => {
+                if(i === slideActual) d.classList.add('active');
+                else d.classList.remove('active');
+            });
+
+            // Inyectar Código (Ahora leyendo desde .value de textarea)
+            // Esto evita que las etiquetas <script> internas rompan el código
+            const textArea = document.getElementById('codigo-slide-' + slideActual);
+            const codigo = textArea.value; 
+
+            const proyector = document.getElementById('proyector');
+            const contenedor = document.getElementById('contenedor-pantalla');
+            
+            // Efecto visual de recarga
+            contenedor.classList.remove('fade-in');
+            void contenedor.offsetWidth; 
+            contenedor.classList.add('fade-in');
+
+            proyector.contentWindow.document.open();
+            proyector.contentWindow.document.write(codigo);
+            proyector.contentWindow.document.close();
+        }
+
+        function cambiarSlide(direccion) {
+            slideActual += direccion;
+            if (slideActual < 0) slideActual = totalSlides - 1;
+            if (slideActual >= totalSlides) slideActual = 0;
+            actualizarUI();
+        }
+
+        function irASlide(n) {
+            slideActual = n;
+            actualizarUI();
+        }
+
+        // Iniciar
+        window.onload = () => {
+            // Pequeño timeout para asegurar que el contenido pegado esté listo
+            setTimeout(actualizarUI, 100);
+        };
+    </script>
+</body>
+</html>
